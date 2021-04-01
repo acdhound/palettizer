@@ -1,2 +1,2 @@
 # palettizer
-Simple tool to convert images using a given palette
+Palettizer is a simple tool to reduce images' color space to a given palette. 
