@@ -6,8 +6,10 @@ from PIL import Image
 
 def quantize_cie76(img_path, palette):
     img = io.imread(img_path)
-    if len(img.shape) < 3 or img.shape[2] != 3:
-        raise Exception("3 channel image expected, but given an image of shape " + img.shape)
+    if len(img.shape) < 3 or img.shape[2] < 3:
+        raise Exception(f"At least 3 channel image expected, but given an image of shape {img.shape}")
+    if img.shape[2] > 3:
+        img = skcolor.rgba2rgb(img)
     img_lab = skcolor.rgb2lab(img)
 
     palette_lab = [skcolor.rgb2lab(np.array(c, dtype=np.uint8)) for c in palette]
