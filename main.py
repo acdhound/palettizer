@@ -1,6 +1,7 @@
 from PIL import Image
-from quantize import quantize
+from quantize import quantize_cie76
 from palette import parse_palette
+from skimage import io
 import sys
 
 if __name__ != '__main__':
@@ -17,17 +18,17 @@ print('Parsing the palette from ' + palette + '...')
 palette = parse_palette(palette)
 print("Successfully parsed")
 
-print('Opening image from ' + input_img + '...')
-im = Image.open(input_img)
-print('Image opened')
-print(im.format, im.size, im.mode)
+# print('Opening image from ' + input_img + '...')
+# im = Image.open(input_img)
+# print('Image opened')
+# print(im.format, im.size, im.mode)
 
-print('Quantizing the image...')
-quantize(im, palette)
+print('Quantizing the image from file ' + input_img + '...')
+result = quantize_cie76(input_img, palette)
 print('Quantization finished')
 
 print('Saving the quantized image to ' + output_img + '...')
-im.save(output_img)
+io.imsave(output_img, result)
 print('Successfully saved')
 
 exit(0)

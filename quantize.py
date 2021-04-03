@@ -11,12 +11,9 @@ def quantize_cie76(img_path, palette):
 
     palette_lab = [skcolor.rgb2lab(np.array(c, dtype=np.uint8)) for c in palette]
 
-    img_lab_quant = np.zeros(img_lab.shape, dtype=img_lab.dtype)
-    for x in range(0, img_lab.shape[0]):
-        for y in range(0, img_lab.shape[1]):
-            c0 = img_lab[x][y]
-            closest_clr = find_closest(c0, palette_lab)
-            img_lab_quant[x][y] = closest_clr
+    def convert_to_palette(c):
+        return find_closest(c, palette_lab)
+    img_lab_quant = np.apply_along_axis(convert_to_palette, 2, img_lab)
 
     return skcolor.lab2rgb(img_lab_quant)
 
