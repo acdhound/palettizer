@@ -1,6 +1,7 @@
 import skimage.color as skcolor
 from skimage import io
 import numpy as np
+from PIL import Image
 
 
 def quantize_cie76(img_path, palette):
@@ -18,7 +19,8 @@ def quantize_cie76(img_path, palette):
     return skcolor.lab2rgb(img_lab_quant)
 
 
-def quantize(img, palette):
+def quantize(img_path, palette):
+    img = Image.open(img_path)
     if img.mode not in ('RGB', 'RGBA'):
         raise Exception(f"Can't work with {img.mode}, RGB or RGBA expected")
 
@@ -27,6 +29,8 @@ def quantize(img, palette):
             color = img.getpixel((x, y))
             palette_color = find_closest(color, palette)
             img.putpixel((x, y), palette_color)
+
+    return np.array(img)
 
 
 def find_closest(color, palette):
