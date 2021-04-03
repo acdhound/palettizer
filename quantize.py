@@ -1,3 +1,35 @@
+import skimage.color as skcolor
+from skimage import io
+import numpy as np
+
+
+def quantize_cie76(img_path, palette):
+    img = io.imread(img_path)
+    if len(img.shape) < 3 or img.shape[2] != 3:
+        raise Exception("3 channel image expected, but given an image of shape " + img.shape)
+    img_lab = skcolor.rgb2lab(img)
+
+    palette_lab = [skcolor.rgb2lab(np.array(c, dtype=np.uint8)) for c in palette]
+
+    img_lab_quant = np.zeros(img_lab.shape, dtype=img_lab.dtype)
+    for x in range(0, img_lab.shape[0]):
+        for y in range(0, img_lab.shape[1]):
+            c0 = img_lab[x][y]
+            min_distance = 0.00
+            closest_clr = None
+            first = True
+            for c1 in palette_lab:
+                d = c1 - c0
+                distance = d[0] * d[0] + d[1] * d[1] + d[2] * d[2]
+                if first or distance < min_distance:
+                    min_distance = distance
+                    closest_clr = c1
+                    first = False
+            img_lab_quant[x][y] = closest_clr
+
+    return skcolor.lab2rgb(img_lab_quant)
+
+
 
 def quantize(img, palette):
     if img.mode not in ('RGB', 'RGBA'):
