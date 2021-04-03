@@ -15,20 +15,10 @@ def quantize_cie76(img_path, palette):
     for x in range(0, img_lab.shape[0]):
         for y in range(0, img_lab.shape[1]):
             c0 = img_lab[x][y]
-            min_distance = 0.00
-            closest_clr = None
-            first = True
-            for c1 in palette_lab:
-                d = c1 - c0
-                distance = d[0] * d[0] + d[1] * d[1] + d[2] * d[2]
-                if first or distance < min_distance:
-                    min_distance = distance
-                    closest_clr = c1
-                    first = False
+            closest_clr = find_closest(c0, palette_lab)
             img_lab_quant[x][y] = closest_clr
 
     return skcolor.lab2rgb(img_lab_quant)
-
 
 
 def quantize(img, palette):
