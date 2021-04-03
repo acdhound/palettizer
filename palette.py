@@ -6,8 +6,8 @@ def parse_palette(file):
     with open(file) as json_file:
         data = json.load(json_file)
         arr = data['palette']
-        for hexrgb in arr:
-            color = parse_hexrgb(hexrgb)
+        for item in arr:
+            color = parse_hexrgb(item['color'])
             palette.append(color)
     return palette
 
