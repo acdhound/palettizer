@@ -1,8 +1,10 @@
 # palettizer
 Palettizer is a simple tool to reduce images' color space to a given palette. 
 
-Dependencies:
-pillow
+Requirements:
+* python 3
+* pillow
+* scikit-image
 
 Usage:
 
