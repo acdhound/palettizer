@@ -18,7 +18,6 @@ palette = parse_palette(palette)
 print("Successfully parsed")
 
 print('Quantizing the image from file ' + input_img + '...')
-# result = quantize(input_img, palette)
 result = quantize(input_img, palette)
 print('Quantization finished')
 
