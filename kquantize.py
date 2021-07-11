@@ -33,13 +33,21 @@ def recreate_image(codebook, labels, w, h):
     return image
 
 
-def quantize(img_path):
-    n_colors = 4
+def quantize(img_path, palette):
+    codebook_palette = np.zeros((len(palette), 3), dtype=np.float64)
+    i = 0
+    for clr in palette:
+        codebook_palette[i][0] = float(clr[0]) / 255
+        codebook_palette[i][1] = float(clr[1]) / 255
+        codebook_palette[i][2] = float(clr[2]) / 255
+        i = i + 1
 
-    palette = read_rgb_image("palette.jpg")
-    palette = np.array(palette, dtype=np.float64) / 255
-    palette_kmeans = fit_to_kmeans(palette, n_colors)
-    codebook_palette = palette_kmeans.cluster_centers_
+    # n_colors = 4
+
+    # palette = read_rgb_image("palette.jpg")
+    # palette = np.array(palette, dtype=np.float64) / 255
+    # palette_kmeans = fit_to_kmeans(palette, n_colors)
+    # codebook_palette = palette_kmeans.cluster_centers_
 
     image = read_rgb_image(img_path)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
