@@ -8,7 +8,7 @@ def parse_palette(file):
         arr = data['palette']
         for item in arr:
             color = parse_hexrgb(item['color'])
-            palette.append(color)
+            palette.append({"color": color, "name": item["name"]})
     return palette
 
 

@@ -18,11 +18,18 @@ palette = parse_palette(palette)
 print("Successfully parsed")
 
 print('Quantizing the image from file ' + input_img + '...')
-result = quantize(input_img, palette)
+result, palette_hystogram = quantize(input_img, palette)
 print('Quantization finished')
 
 print('Saving the quantized image to ' + output_img + '...')
 io.imsave(output_img, result)
 print('Successfully saved')
+
+print("Palette colors usage:")
+palette_hystogram_sorted = sorted(palette_hystogram.items(), key=lambda i: i[1])
+palette_hystogram_sorted.reverse()
+image_area = result.shape[0] * result.shape[1]
+for item in palette_hystogram_sorted:
+    print(f"Color: {palette[item[0]]['name']}, area: {item[1] / image_area} %")
 
 exit(0)
