@@ -1,8 +1,8 @@
-from quantize import quantize_cie76
 from quantize import quantize
 from palette import parse_palette
 from skimage import io
 import sys
+import kquantize
 
 if __name__ != '__main__':
     print("The script isn't executed as main, terminating")
@@ -19,7 +19,8 @@ palette = parse_palette(palette)
 print("Successfully parsed")
 
 print('Quantizing the image from file ' + input_img + '...')
-result = quantize(input_img, palette)
+# result = quantize(input_img, palette)
+result = kquantize.quantize(input_img)
 print('Quantization finished')
 
 print('Saving the quantized image to ' + output_img + '...')

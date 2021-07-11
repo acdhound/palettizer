@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin
 from skimage import io
@@ -51,15 +50,4 @@ def quantize(img_path):
                             image.shape[0],
                             image.shape[1])
 
-    # show image for testing
-    # plt.figure(0)
-    # plt.clf()
-    # plt.axis('off')
-    # plt.title('Quantized image (12 colors, Palette)')
-    # plt.imshow(result)
-    # plt.show()
-
     return result
-
-
-print(quantize("testimage2.png"))
