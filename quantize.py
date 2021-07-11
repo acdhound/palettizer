@@ -6,8 +6,11 @@ from skimage import io
 
 def read_rgb_image(path):
     img = io.imread(path)
-    if len(img.shape) < 3 or img.shape[2] < 3:
-        raise Exception(f"At least 3 channel image expected, but given an image of shape {img.shape}")
+    if len(img.shape) != 3 or img.shape[2] < 3 or img.shape[2] > 4:
+        raise Exception(f"3 channel RGB image expected, but given an image of shape {img.shape}")
+    print("ignoring alpha channel of the image")
+    if img.shape[2] == 4:
+        img = img[:, :, :3]
     return img
 
 
