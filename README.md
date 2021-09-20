@@ -8,4 +8,7 @@ Requirements:
 
 Usage:
 
-```./main.py <input image path> <palette file path> <output image path>```
+```
+python setup.py install
+python palettizer/main.py <input image path> <palette file path> <output image path>
+```
