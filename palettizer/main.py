@@ -30,6 +30,7 @@ palette_hystogram_sorted = sorted(palette_hystogram.items(), key=lambda i: i[1])
 palette_hystogram_sorted.reverse()
 image_area = result.shape[0] * result.shape[1]
 for item in palette_hystogram_sorted:
-    print(f"Color: {palette[item[0]]['name']}, area: {(item[1] / image_area) * 100} %")
+    area_percentage = (item[1] / image_area) * 100
+    print(f"Color: {palette[item[0]]['name']}, area: {area_percentage} %")
 
 exit(0)
