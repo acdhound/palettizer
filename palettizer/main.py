@@ -21,11 +21,11 @@ input_img = nonempty_str(sys.argv[1])
 palette = nonempty_str(sys.argv[2])
 output_img = nonempty_str(sys.argv[3])
 
-n_colors = 20
+n_colors = 0
 if len(sys.argv) > 4:
     n_colors = int(sys.argv[4])
-    if n_colors <= 0:
-        raise Exception("Number of colors should be a positive integer")
+    if n_colors < 0:
+        raise Exception("Number of colors should be >= 0")
 
 print('Parsing the palette from ' + palette + '...')
 palette = parse_palette(palette)
