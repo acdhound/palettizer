@@ -10,5 +10,11 @@ Usage:
 
 ```
 python setup.py install
-python palettizer/main.py <input image path> <palette file path> <output image path>
+python palettizer/main.py <input image path> <comma-separated paths to palette files> <output image path>
+```
+
+Example:
+
+```
+python palettizer/main.py testimage6.png arton-palette.json,mtnblack-palette.json,mtn94-palette.json output.png 30
 ```

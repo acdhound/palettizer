@@ -1,14 +1,15 @@
 import json
 
 
-def parse_palette(file):
+def parse_palette(palette_paths):
     palette = []
-    with open(file) as json_file:
-        data = json.load(json_file)
-        arr = data['palette']
-        for item in arr:
-            color = parse_hexrgb(item['color'])
-            palette.append({"color": color, "name": item["name"]})
+    for file in palette_paths.split(","):
+        with open(file) as json_file:
+            data = json.load(json_file)
+            arr = data['palette']
+            for item in arr:
+                color = parse_hexrgb(item['color'])
+                palette.append({"color": color, "name": item["name"]})
     return palette
 
 
