@@ -10,7 +10,7 @@ Usage:
 
 ```
 python setup.py install
-python palettizer/main.py <input image path> <comma-separated paths to palette files> <output image path>
+python palettizer/main.py <input image path> <comma-separated paths to palette files> <output image path> [<max number of colors, 0 is infinite>]
 ```
 
 Example:
