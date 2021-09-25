@@ -49,6 +49,7 @@ def quantize(img_path, palette, n_colors=20):
     image = read_rgb_image(img_path)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
+    print("Reducing color space of the image to " + str(n_colors) + " colors")
     kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array)
     kmeans_palette = kmeans.cluster_centers_
     kmeans_labels = kmeans.predict(image_array)
@@ -57,6 +58,7 @@ def quantize(img_path, palette, n_colors=20):
 
     image_array = image_to_flat_array(kmeans_image)
 
+    print("Converting image colors to the palette")
     labels_palette = pairwise_distances_argmin(codebook_palette, image_array, axis=0)
 
     # todo convert image to uint8 array
