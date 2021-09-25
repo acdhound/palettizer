@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
+from sklearn.cluster import KMeans
 from skimage import io
 
 
@@ -36,7 +37,7 @@ def recreate_image(codebook, labels, w, h):
     return image, palette_hystogram
 
 
-def quantize(img_path, palette):
+def quantize(img_path, palette, n_colors=20):
     codebook_palette = np.zeros((len(palette), 3), dtype=np.float64)
     i = 0
     for clr in palette:
@@ -47,7 +48,16 @@ def quantize(img_path, palette):
 
     image = read_rgb_image(img_path)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
+
+    kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array)
+    kmeans_palette = kmeans.cluster_centers_
+    kmeans_labels = kmeans.predict(image_array)
+    kmeans_image, hyst = recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
+    # io.imsave("./kmeans.png", kmeans_image)
+
+    image_array = image_to_flat_array(kmeans_image)
+
     labels_palette = pairwise_distances_argmin(codebook_palette, image_array, axis=0)
 
     # todo convert image to uint8 array
-    return recreate_image(codebook_palette, labels_palette, image.shape[0], image.shape[1])
+    return recreate_image(codebook_palette, labels_palette, kmeans_image.shape[0], kmeans_image.shape[1])
