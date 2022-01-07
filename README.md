@@ -16,5 +16,5 @@ python palettizer/main.py <input image path> <comma-separated paths to palette f
 Example:
 
 ```
-python palettizer/main.py testimage6.png arton-palette.json,mtnblack-palette.json,mtn94-palette.json output.png 30
+python palettizer/main.py palettizer/resources/testimage2.png palettizer/resources/arton-palette.json,palettizer/resources/mtnblack-palette.json,palettizer/resources/mtn94-palette.json output.png 30
 ```
