@@ -2,6 +2,7 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 from telegram.ext.filters import Filters
 import sys
+from handlers import handle_message_with_image
 
 
 def start(update: Update, context: CallbackContext):
@@ -28,7 +29,7 @@ def start(update: Update, context: CallbackContext):
 
 
 def img(update: Update, context: CallbackContext):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="This functionality is not supported yet")
+    handle_message_with_image(update, context)
 
 
 def reject(update: Update, context: CallbackContext):
