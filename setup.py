@@ -6,12 +6,15 @@ setup(
    description='',
    author='Alexander Ivanov',
    author_email='adivanov95@gmail.com',
-   packages=['palettizer'],
+   packages=['palettizer', 'tgbot'],
    install_requires=[
       'scikit-image',
       'scikit-learn',
       'python-telegram-bot',
       'pyyaml'
    ],
-   python_requires=">=3.6"
+   python_requires=">=3.6",
+   extras_require={
+      'test': ['pytest']
+   }
 )

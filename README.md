@@ -9,7 +9,7 @@ Requirements:
 Usage:
 
 ```
-python setup.py install
+pip install .
 python palettizer/main.py <input image path> <comma-separated paths to palette files> <output image path> [<max number of colors, 0 is infinite>]
 ```
 
@@ -17,4 +17,10 @@ Example:
 
 ```
 python palettizer/main.py palettizer/resources/testimage2.png palettizer/resources/arton-palette.json,palettizer/resources/mtnblack-palette.json,palettizer/resources/mtn94-palette.json output.png 30
+```
+
+Run tests:
+```
+pip install .[test]
+pytest
 ```
