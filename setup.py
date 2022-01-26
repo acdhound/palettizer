@@ -7,6 +7,11 @@ setup(
    author='Alexander Ivanov',
    author_email='adivanov95@gmail.com',
    packages=['palettizer'],
-   install_requires=['scikit-image', 'scikit-learn', 'python-telegram-bot'],
+   install_requires=[
+      'scikit-image',
+      'scikit-learn',
+      'python-telegram-bot',
+      'pyyaml'
+   ],
    python_requires=">=3.6"
 )

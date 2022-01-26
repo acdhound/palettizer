@@ -1,5 +1,9 @@
 from telegram import Update
 from telegram.ext import CallbackContext
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def handle_message_with_image(update: Update, context: CallbackContext):
@@ -29,7 +33,7 @@ def handle_message_with_image(update: Update, context: CallbackContext):
         return
     bytes_array = file.download_as_bytearray()
     # todo process the image here
-    print("File of {} bytes was downloaded".format(len(bytes_array)))
+    logger.info("File of {} bytes was downloaded".format(len(bytes_array)))
 
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="The operation is not supported yet")

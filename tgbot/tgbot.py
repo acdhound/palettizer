@@ -1,14 +1,13 @@
+# todo this is a hack to configure logging before a logger is initialized in each imported module
+import initlogging
+import logging
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 from telegram.ext.filters import Filters
 import sys
-import logging
 from handlers import handle_message_with_image
 
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
 logger = logging.getLogger(__name__)
 
 
