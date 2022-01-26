@@ -2,10 +2,23 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 from telegram.ext.filters import Filters
 import sys
+import logging
 from handlers import handle_message_with_image
 
 
-def start(update: Update, context: CallbackContext):
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+logger = logging.getLogger(__name__)
+
+
+def on_error(update: object, context: CallbackContext) -> None:
+    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+    if isinstance(update, Update):
+        update.message.reply_text(text="Something went badly wrong, please contact support")
+
+
+def on_start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text="""
   Hi, I'm Palettizer bot!
 
@@ -28,27 +41,36 @@ def start(update: Update, context: CallbackContext):
 """)
 
 
-def img(update: Update, context: CallbackContext):
+def on_img(update: Update, context: CallbackContext):
     handle_message_with_image(update, context)
 
 
-def reject(update: Update, context: CallbackContext):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Invalid message, type /start for help")
+def on_reject(update: Update, context: CallbackContext):
+    raise Exception("Test exception")
+    # update.message.reply_text(text="Invalid message, type /start for help")
 
 
-token = sys.argv[1]
+def main():
+    token = sys.argv[1]
 
-updater = Updater(token=token, use_context=True)
-dispatcher = updater.dispatcher
+    updater = Updater(token=token, use_context=True)
+    dispatcher = updater.dispatcher
 
-start_handler = CommandHandler(command='start', callback=start)
-dispatcher.add_handler(start_handler)
+    dispatcher.add_error_handler(on_error)
 
-img_filter = Filters.photo | Filters.document.image
-img_handler = MessageHandler(filters=img_filter, callback=img)
-dispatcher.add_handler(img_handler)
+    start_handler = CommandHandler(command='start', callback=on_start)
+    dispatcher.add_handler(start_handler)
 
-reject_handler = MessageHandler(filters=(~Filters.command & ~img_filter), callback=reject)
-dispatcher.add_handler(reject_handler)
+    img_filter = Filters.photo | Filters.document.image
+    img_handler = MessageHandler(filters=img_filter, callback=on_img)
+    dispatcher.add_handler(img_handler)
 
-updater.start_polling()
+    reject_handler = MessageHandler(filters=(~Filters.command & ~img_filter), callback=on_reject)
+    dispatcher.add_handler(reject_handler)
+
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
