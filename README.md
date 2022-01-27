@@ -53,14 +53,14 @@ See the example command below:
 
 ```shell
 # Unix
-python palettizer/main.py palettizer/resources/testimage2.png \
+python palettizer/main.py palettizer/resources/bliss.jpg \
     palettizer/resources/mtnblack-palette.json,palettizer/resources/mtn94-palette.json \
     output.png \
     30
 ```
 ```cmd
 REM Windows
-python palettizer\main.py palettizer\resources\testimage2.png ^
+python palettizer\main.py palettizer\resources\bliss.jpg ^
     palettizer\resources\mtnblack-palette.json,palettizer\resources\mtn94-palette.json ^
     output.png ^
     30
