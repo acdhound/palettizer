@@ -48,5 +48,4 @@ def test_quantize__4_colors_palette():
     assert np.array_equal(output_img[30][30], GREEN)
     assert np.array_equal(output_img[38][38], GREEN)
 
-    # why not 400?
-    assert hystogram == {0: 399, 1: 399, 2: 399, 3: 399}
+    assert hystogram == {0: 400, 1: 400, 2: 400, 3: 400}

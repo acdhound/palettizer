@@ -28,17 +28,17 @@ def recreate_image(codebook, labels, w, h):
     d = codebook.shape[1]
     image = np.zeros(shape=(w, h, d), dtype=codebook.dtype)
     label_idx = 0
-    palette_hystogram = {}
+    palette_histogram = {}
     for i in range(w):
         for j in range(h):
             label = labels[label_idx]
             image[i][j] = codebook[label]
-            if label not in palette_hystogram:
-                palette_hystogram[label] = 0
+            if label not in palette_histogram:
+                palette_histogram[label] = 1
             else:
-                palette_hystogram[label] += 1
+                palette_histogram[label] += 1
             label_idx += 1
-    return image, palette_hystogram
+    return image, palette_histogram
 
 
 def quantize(img_path, palette, n_colors=0):

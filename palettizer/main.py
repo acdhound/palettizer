@@ -4,8 +4,8 @@ from skimage import io
 import sys
 
 
-def nonempty_str(input):
-    str_in = str(input)
+def nonempty_str(value):
+    str_in = str(value)
     if len(str_in) <= 0:
         raise Exception("a non-empty argument is required")
     return str_in
@@ -32,7 +32,7 @@ palette = parse_palette(palette)
 print("Successfully parsed")
 
 print('Quantizing the image from file ' + input_img + '...')
-result, palette_hystogram = quantize(input_img, palette, n_colors)
+result, palette_histogram = quantize(input_img, palette, n_colors)
 print('Quantization finished')
 
 print('Saving the quantized image to ' + output_img + '...')
@@ -40,10 +40,10 @@ io.imsave(output_img, result)
 print('Successfully saved')
 
 print("Palette colors usage:")
-palette_hystogram_sorted = sorted(palette_hystogram.items(), key=lambda i: i[1])
-palette_hystogram_sorted.reverse()
+palette_histogram_sorted = sorted(palette_histogram.items(), key=lambda i: i[1])
+palette_histogram_sorted.reverse()
 image_area = result.shape[0] * result.shape[1]
-for item in palette_hystogram_sorted:
+for item in palette_histogram_sorted:
     area_percentage = (item[1] / image_area) * 100
     print(f"Color: {palette[item[0]]['name']}, area: {area_percentage} %")
 
