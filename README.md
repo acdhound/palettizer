@@ -74,4 +74,3 @@ Run tests:
 pip install .[test]
 pytest
 ```
-
