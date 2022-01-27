@@ -1,14 +1,12 @@
 from palettizer.quantize import read_rgb_image
 from palettizer.quantize import quantize
 from palettizer.palette import parse_palette
-import os
-from pathlib import Path
+from testutils import get_test_resource
 import numpy as np
 
 
-RESOURCES_DIR = Path(os.path.realpath(__file__)).parent.absolute()
-IMAGE_4_SQUARES = str(RESOURCES_DIR.joinpath("resources/4_squares.png"))
-IMAGE_BLISS = str(RESOURCES_DIR.joinpath("resources/bliss.jpg"))
+IMAGE_4_SQUARES = str(get_test_resource("4_squares.png"))
+IMAGE_BLISS = str(get_test_resource("bliss.jpg"))
 
 PALETTE_4_COLORS = [
     {'color': (255, 0, 0), 'name': 'red', 'vendor': 'ABC Paints'},
@@ -21,7 +19,7 @@ YELLOW = np.array([255, 255, 0], dtype=np.uint8)
 GREEN = np.array([0, 255, 0], dtype=np.uint8)
 BLUE = np.array([0, 0, 255], dtype=np.uint8)
 
-PALETTE_MTN_BLACK = parse_palette(str(RESOURCES_DIR.joinpath("resources/mtnblack-palette.json")))
+PALETTE_MTN_BLACK = parse_palette(str(get_test_resource("mtnblack-palette.json")))
 BLK_TR5010 = np.array([84, 174, 227], dtype=np.uint8)
 BLK_6710 = np.array([147, 184, 39], dtype=np.uint8)
 BLK_9100 = np.array([255, 255, 255], dtype=np.uint8)

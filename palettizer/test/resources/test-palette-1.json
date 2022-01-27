@@ -1,0 +1,7 @@
+{
+  "palette": [
+    {"color":"ff0000","name":"Red","vendor":"ABC Paints"},
+    {"color":"00ff00","name":"Green","vendor":"ABC Paints"},
+    {"color":"0000ff","name":"Blue","vendor":"ABC Paints"}
+  ]
+}

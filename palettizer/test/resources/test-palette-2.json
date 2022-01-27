@@ -1,0 +1,7 @@
+{
+  "palette": [
+    {"color":"ffff00","name":"Yellow","vendor":"ABC Paints"},
+    {"color":"00ffff","name":"Cyan","vendor":"ABC Paints"},
+    {"color":"ff00ff","name":"Magenta","vendor":"ABC Paints"}
+  ]
+}
