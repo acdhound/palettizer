@@ -10,6 +10,7 @@ setup(
    install_requires=[
       'scikit-image',
       'scikit-learn',
+      'numpy',
       'python-telegram-bot',
       'pyyaml'
    ],
