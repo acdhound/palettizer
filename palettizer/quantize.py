@@ -9,7 +9,7 @@ def image_to_flat_array(img):
     return np.reshape(img, (w * h, d))
 
 
-def recreate_image(codebook, labels, palette, w, h):
+def recreate_image(codebook, labels, w, h, palette=None):
     """Recreate the (compressed) image from the code book & labels"""
     d = codebook.shape[1]
     image = np.zeros(shape=(w, h, d), dtype=codebook.dtype)
@@ -20,7 +20,10 @@ def recreate_image(codebook, labels, palette, w, h):
             label = labels[label_idx]
             image[i][j] = codebook[label]
             if label not in palette_histogram:
-                palette_histogram[label] = {'color': palette[label], 'pixels': 1}
+                if palette is None:
+                    palette_histogram[label] = {'color': codebook[label], 'pixels': 1}
+                else:
+                    palette_histogram[label] = {'color': palette[label], 'pixels': 1}
             else:
                 palette_histogram[label]['pixels'] += 1
             label_idx += 1
@@ -43,16 +46,16 @@ def quantize(img, palette, n_colors=0):
     image = read_rgb_image(img)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
-    if n_colors > 0:
+    if 0 < n_colors < len(palette):
         print("Reducing color space of the image to " + str(n_colors) + " colors")
         kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array)
         kmeans_palette = kmeans.cluster_centers_
         kmeans_labels = kmeans.predict(image_array)
-        kmeans_image, hyst = recreate_image(kmeans_palette, kmeans_labels, palette, image.shape[0], image.shape[1])
+        kmeans_image, hist = recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
         image_array = image_to_flat_array(kmeans_image)
         image = kmeans_image
 
     print("Converting image colors to the palette")
     labels_palette = pairwise_distances_argmin(codebook_palette, image_array, axis=0)
 
-    return recreate_image(codebook_palette_uint8, labels_palette, palette, image.shape[0], image.shape[1])
+    return recreate_image(codebook_palette_uint8, labels_palette, image.shape[0], image.shape[1], palette)
