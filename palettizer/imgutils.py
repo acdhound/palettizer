@@ -2,9 +2,11 @@ import numpy as np
 import imageio
 from skimage import io
 from skimage.util import img_as_ubyte
+from typing import Union
+from io import BytesIO
 
 
-def read_rgb_image(path):
+def read_rgb_image(path: Union[str, bytes, bytearray]) -> np.ndarray:
     if isinstance(path, str):
         img = io.imread(path)
     elif isinstance(path, bytes):
@@ -22,3 +24,10 @@ def read_rgb_image(path):
         print("ignoring alpha channel of the image")
         img = img[:, :, :3]
     return img
+
+
+def image_to_bytes(img: np.ndarray, file_format='png') -> bytes:
+    with BytesIO() as buf:
+        imageio.imwrite(buf, img, format=file_format)
+        image_bin = buf.getvalue()
+    return image_bin
