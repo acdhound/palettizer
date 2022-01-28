@@ -20,7 +20,17 @@ HARDCODED_PALETTE = [
 ]
 
 
-def handle_message_with_image(update: Update, context: CallbackContext):
+def on_error(update: object, context: CallbackContext) -> None:
+    logger.error(msg="Exception while handling an update:", exc_info=context.error)
+    if isinstance(update, Update):
+        update.message.reply_text(text="Something went badly wrong, please contact support")
+
+
+def on_invalid_message(update: Update, context: CallbackContext):
+    update.message.reply_text(text="Invalid message, type /start for help")
+
+
+def on_message_with_image(update: Update, context: CallbackContext):
     if not update.message:
         raise Exception("Can't get a message from an Update")
     if not update.message.document and not update.message.photo:
@@ -61,3 +71,26 @@ def handle_message_with_image(update: Update, context: CallbackContext):
                                   caption=str(hist))
     except Exception as e:
         raise IOError("Failed to process image", e)
+
+
+def on_start_command(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="""
+  Hi, I'm Palettizer bot!
+
+  I can decompose an image by a given color palette.
+  My mission is to help artists who do large-scaled murals and want to chose the right colors from a palette provided by a paint vendor.
+  Just send me a sketch for your future painting and select the palettes you'd like to use and I will show you which colors and in what proportion fit the most.
+
+  Currently supported palettes (use their IDs to select palettes as described below):
+    - Montana Black (ID mtnblack)
+    - Montana 94 (ID mtn94)
+    - Arton (ID arton)
+    - Tikkurila (ID tikkurila)
+
+  How to use me:
+    - Attach your sketch to the message
+    - Write the palette IDs you need separated by comma (see the full list above)
+    - Write the maximum number of colors you'd like to use (default is 30)
+    - The full message should look like this: arton,mtn94 15
+    - Send the message and wait a couple of minutes. I'll pick up the colors for you.
+    """)
