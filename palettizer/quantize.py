@@ -1,21 +1,7 @@
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
 from sklearn.cluster import KMeans
-from skimage import io
-from skimage.util import img_as_ubyte
-
-
-def read_rgb_image(path):
-    img = io.imread(path)
-    if len(img.shape) != 3 or img.shape[2] < 3 or img.shape[2] > 4:
-        raise Exception(f"3 channel RGB image expected, but given an image of shape {img.shape}")
-    if img.dtype != np.uint8:
-        print("conversion from {} to {}, possible lose of data".format(img.dtype, np.uint8))
-        img = img_as_ubyte(img)
-    if img.shape[2] == 4:
-        print("ignoring alpha channel of the image")
-        img = img[:, :, :3]
-    return img
+from . imgutils import read_rgb_image
 
 
 def image_to_flat_array(img):
@@ -41,7 +27,7 @@ def recreate_image(codebook, labels, w, h):
     return image, palette_histogram
 
 
-def quantize(img_path, palette, n_colors=0):
+def quantize(img, palette, n_colors=0):
     codebook_palette = np.zeros((len(palette), 3), dtype=np.float64)
     codebook_palette_uint8 = np.zeros((len(palette), 3), dtype=np.uint8)
     i = 0
@@ -54,7 +40,7 @@ def quantize(img_path, palette, n_colors=0):
         codebook_palette_uint8[i][2] = clr["color"][2]
         i = i + 1
 
-    image = read_rgb_image(img_path)
+    image = read_rgb_image(img)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
     if n_colors > 0:
@@ -63,7 +49,6 @@ def quantize(img_path, palette, n_colors=0):
         kmeans_palette = kmeans.cluster_centers_
         kmeans_labels = kmeans.predict(image_array)
         kmeans_image, hyst = recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
-        # io.imsave("./kmeans.png", kmeans_image)
         image_array = image_to_flat_array(kmeans_image)
         image = kmeans_image
 

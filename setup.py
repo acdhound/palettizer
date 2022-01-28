@@ -11,6 +11,7 @@ setup(
       'scikit-image',
       'scikit-learn',
       'numpy',
+      'imageio',
       'python-telegram-bot',
       'pyyaml'
    ],

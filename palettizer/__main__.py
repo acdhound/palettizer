@@ -1,5 +1,5 @@
-from quantize import quantize
-from palette import parse_palette
+from . quantize import quantize
+from . palette import parse_palette
 from skimage import io
 import sys
 

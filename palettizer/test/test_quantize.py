@@ -1,8 +1,7 @@
-from palettizer.quantize import read_rgb_image
+import numpy as np
 from palettizer.quantize import quantize
 from palettizer.palette import parse_palette
 from testutils import get_test_resource
-import numpy as np
 
 
 IMAGE_4_SQUARES = str(get_test_resource("4_squares.png"))
@@ -25,15 +24,8 @@ BLK_6710 = np.array([147, 184, 39], dtype=np.uint8)
 BLK_9100 = np.array([255, 255, 255], dtype=np.uint8)
 
 
-def test_read_rgb_image():
-    img = read_rgb_image(IMAGE_4_SQUARES)
-    assert img is not None
-    assert img.shape == (40, 40, 3)
-    assert img.dtype == np.uint8
-
-
 def test_quantize__4_colors_palette():
-    output_img, histogram = quantize(img_path=IMAGE_4_SQUARES,
+    output_img, histogram = quantize(img=IMAGE_4_SQUARES,
                                      palette=PALETTE_4_COLORS,
                                      n_colors=0)
 
@@ -57,7 +49,7 @@ def test_quantize__4_colors_palette():
 
 
 def test_quantize__4_colors_palette__max_2_colors():
-    output_img, histogram = quantize(img_path=IMAGE_4_SQUARES,
+    output_img, histogram = quantize(img=IMAGE_4_SQUARES,
                                      palette=PALETTE_4_COLORS,
                                      n_colors=2)
 
@@ -81,7 +73,7 @@ def test_quantize__4_colors_palette__max_2_colors():
 
 
 def test_quantize__large_image__4_colors_palette():
-    output_img, histogram = quantize(img_path=IMAGE_BLISS,
+    output_img, histogram = quantize(img=IMAGE_BLISS,
                                      palette=PALETTE_4_COLORS,
                                      n_colors=0)
 
@@ -97,7 +89,7 @@ def test_quantize__large_image__4_colors_palette():
 
 
 def test_quantize__large_image__real_palette():
-    output_img, histogram = quantize(img_path=IMAGE_BLISS,
+    output_img, histogram = quantize(img=IMAGE_BLISS,
                                      palette=PALETTE_MTN_BLACK,
                                      n_colors=0)
 
@@ -112,3 +104,22 @@ def test_quantize__large_image__real_palette():
     assert histogram[122] == 241127
     assert histogram[60] == 241503
     assert histogram[77] == 276362
+
+
+def test_quantize__binary_image():
+    with open(IMAGE_4_SQUARES, 'rb') as f:
+        image_bin = f.read()
+
+    output_img, histogram = quantize(img=image_bin,
+                                     palette=PALETTE_4_COLORS,
+                                     n_colors=0)
+
+    assert output_img is not None
+    assert output_img.shape == (40, 40, 3)
+    assert output_img.dtype == np.uint8
+    assert np.array_equal(output_img[0][0], RED)
+    assert np.array_equal(output_img[0][20], YELLOW)
+    assert np.array_equal(output_img[20][0], BLUE)
+    assert np.array_equal(output_img[20][20], GREEN)
+
+    assert histogram == {0: 400, 1: 400, 2: 400, 3: 400}

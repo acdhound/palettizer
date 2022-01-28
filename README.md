@@ -17,14 +17,14 @@ Then run Palettizer by the following command:
 
 ```
 # Unix
-python palettizer/main.py <input image path> \
+python -m palettizer <input image path> \
     <comma-separated paths to palette files> \
     <output image path> \
     [<max number of colors, 0 is infinite>]
 ```
 ```
 REM Windows
-python palettizer\main.py <input image path> ^
+python -m palettizer <input image path> ^
     <palette files> ^
     <output image path> ^
     [<max number of colors>]
@@ -53,14 +53,14 @@ See the example command below:
 
 ```shell
 # Unix
-python palettizer/main.py palettizer/resources/bliss.jpg \
+python -m palettizer palettizer/resources/bliss.jpg \
     palettizer/resources/mtnblack-palette.json,palettizer/resources/mtn94-palette.json \
     output.png \
     30
 ```
 ```cmd
 REM Windows
-python palettizer\main.py palettizer\resources\bliss.jpg ^
+python -m palettizer palettizer\resources\bliss.jpg ^
     palettizer\resources\mtnblack-palette.json,palettizer\resources\mtn94-palette.json ^
     output.png ^
     30
