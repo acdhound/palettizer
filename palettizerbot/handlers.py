@@ -3,21 +3,10 @@ from telegram.ext import CallbackContext
 import logging
 from palettizer.quantize import quantize
 from palettizer.imgutils import image_to_bytes
+from palettizer.palette import get_predefined_palette
 
 
 logger = logging.getLogger(__name__)
-
-
-HARDCODED_PALETTE = [
-    {'color': (255, 0, 0), 'name': 'Red', 'vendor': 'Sample Colors'},
-    {'color': (0, 255, 0), 'name': 'Green', 'vendor': 'Sample Colors'},
-    {'color': (0, 0, 255), 'name': 'Blue', 'vendor': 'Sample Colors'},
-    {'color': (255, 255, 0), 'name': 'Yellow', 'vendor': 'Sample Colors'},
-    {'color': (0, 255, 255), 'name': 'Cyan', 'vendor': 'Sample Colors'},
-    {'color': (255, 0, 255), 'name': 'Magenta', 'vendor': 'Sample Colors'},
-    {'color': (255, 255, 255), 'name': 'White', 'vendor': 'Sample Colors'},
-    {'color': (0, 0, 0), 'name': 'Black', 'vendor': 'Sample Colors'},
-]
 
 
 def on_error(update: object, context: CallbackContext) -> None:
@@ -64,7 +53,8 @@ def on_message_with_image(update: Update, context: CallbackContext):
 
     try:
         logger.debug("Processing image file from the message")
-        out_image, hist = quantize(image_as_bytearray, HARDCODED_PALETTE)
+        palette = get_predefined_palette("mtnblack")
+        out_image, hist = quantize(image_as_bytearray, palette)
         logger.debug("Processing finished, sending the result to the chat")
         context.bot.send_document(chat_id=update.effective_chat.id,
                                   document=image_to_bytes(out_image))
