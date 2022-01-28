@@ -6,7 +6,7 @@ setup(
    description='',
    author='Alexander Ivanov',
    author_email='adivanov95@gmail.com',
-   packages=['palettizer', 'tgbot'],
+   packages=['palettizer', 'palettizerbot'],
    install_requires=[
       'scikit-image',
       'scikit-learn',
