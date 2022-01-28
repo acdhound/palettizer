@@ -45,7 +45,15 @@ def test_quantize__4_colors_palette():
     assert np.array_equal(output_img[30][30], GREEN)
     assert np.array_equal(output_img[38][38], GREEN)
 
-    assert histogram == {0: 400, 1: 400, 2: 400, 3: 400}
+    assert histogram is not None
+    assert {'color': {'color': (255, 0, 0), 'name': 'red', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
+    assert {'color': {'color': (255, 255, 0), 'name': 'yellow', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
+    assert {'color': {'color': (0, 255, 0), 'name': 'green', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
+    assert {'color': {'color': (0, 0, 255), 'name': 'blue', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
 
 
 def test_quantize__4_colors_palette__max_2_colors():
@@ -69,7 +77,11 @@ def test_quantize__4_colors_palette__max_2_colors():
     assert np.array_equal(output_img[30][30], YELLOW)
     assert np.array_equal(output_img[38][38], YELLOW)
 
-    assert histogram == {1: 1200, 3: 400}
+    assert histogram is not None
+    assert {'color': {'color': (255, 255, 0), 'name': 'yellow', 'vendor': 'ABC Paints'},
+            'pixels': 1200} in histogram.values()
+    assert {'color': {'color': (0, 0, 255), 'name': 'blue', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
 
 
 def test_quantize__large_image__4_colors_palette():
@@ -85,7 +97,15 @@ def test_quantize__large_image__4_colors_palette():
     assert np.array_equal(output_img[737][1175], GREEN)
     assert np.array_equal(output_img[1019][477], RED)
 
-    assert histogram == {3: 1054452, 1: 234877, 2: 780095, 0: 4176}
+    assert histogram is not None
+    assert {'color': {'color': (255, 0, 0), 'name': 'red', 'vendor': 'ABC Paints'},
+            'pixels': 4176} in histogram.values()
+    assert {'color': {'color': (255, 255, 0), 'name': 'yellow', 'vendor': 'ABC Paints'},
+            'pixels': 234877} in histogram.values()
+    assert {'color': {'color': (0, 255, 0), 'name': 'green', 'vendor': 'ABC Paints'},
+            'pixels': 780095} in histogram.values()
+    assert {'color': {'color': (0, 0, 255), 'name': 'blue', 'vendor': 'ABC Paints'},
+            'pixels': 1054452} in histogram.values()
 
 
 def test_quantize__large_image__real_palette():
@@ -101,9 +121,12 @@ def test_quantize__large_image__real_palette():
     assert np.array_equal(output_img[374][1500], BLK_9100)
 
     assert histogram is not None
-    assert histogram[122] == 241127
-    assert histogram[60] == 241503
-    assert histogram[77] == 276362
+    assert {'color': {"color": (70, 89, 13), "name": "BLK 6725 Troops", "vendor": "Montana Black"},
+            'pixels': 241127} in histogram.values()
+    assert {'color': {"color": (146, 167, 227), "name": "BLK 4320 Brunhilde", "vendor": "Montana Black"},
+            'pixels': 241503} in histogram.values()
+    assert {'color': {"color": (27, 144, 222), "name": "BLK 5230 Blue Lagoon", "vendor": "Montana Black"},
+            'pixels': 276362} in histogram.values()
 
 
 def test_quantize__binary_image():
@@ -122,4 +145,12 @@ def test_quantize__binary_image():
     assert np.array_equal(output_img[20][0], BLUE)
     assert np.array_equal(output_img[20][20], GREEN)
 
-    assert histogram == {0: 400, 1: 400, 2: 400, 3: 400}
+    assert histogram is not None
+    assert {'color': {'color': (255, 0, 0), 'name': 'red', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
+    assert {'color': {'color': (255, 255, 0), 'name': 'yellow', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
+    assert {'color': {'color': (0, 255, 0), 'name': 'green', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
+    assert {'color': {'color': (0, 0, 255), 'name': 'blue', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()

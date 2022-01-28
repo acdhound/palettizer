@@ -40,11 +40,11 @@ io.imsave(output_img, result)
 print('Successfully saved')
 
 print("Palette colors usage:")
-palette_histogram_sorted = sorted(palette_histogram.items(), key=lambda i: i[1])
+palette_histogram_sorted = sorted(palette_histogram.values(), key=lambda i: i['pixels'])
 palette_histogram_sorted.reverse()
 image_area = result.shape[0] * result.shape[1]
 for item in palette_histogram_sorted:
-    area_percentage = (item[1] / image_area) * 100
-    print(f"Color: {palette[item[0]]['name']}, area: {area_percentage} %")
+    area_percentage = (item['pixels'] / image_area) * 100
+    print(f"Color: {item['color']['name']} {item['color']['vendor']}, area: {area_percentage} %")
 
 exit(0)

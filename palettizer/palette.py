@@ -9,7 +9,7 @@ def parse_palette(palette_paths):
             arr = data['palette']
             for item in arr:
                 color = parse_hexrgb(item['color'])
-                palette.append({"color": color, "name": item["name"]})
+                palette.append({"color": color, "name": item["name"], "vendor": item["vendor"]})
     return palette
 
 
