@@ -31,7 +31,7 @@ def test_parse_palette__multiple_files():
 
 
 def test_get_predefined_palette__single_file():
-    palette = get_predefined_palette('mtnblack')
+    palette = get_predefined_palette(['mtnblack'])
 
     assert palette is not None
     assert len(palette) == 189
@@ -41,7 +41,7 @@ def test_get_predefined_palette__single_file():
 
 
 def test_get_predefined_palette__multiple_files():
-    palette = get_predefined_palette('mtnblack', 'mtn94')
+    palette = get_predefined_palette(['mtnblack', 'mtn94'])
 
     assert palette is not None
     assert len(palette) == (189 + 136)

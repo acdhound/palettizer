@@ -1,14 +1,20 @@
 import json
 from pathlib import Path
 import os
+from typing import Union
 
 
-def get_predefined_palette(*palette_ids) -> list:
+PREDEFINED_PALETTES = ("mtnblack", "mtn94", "arton", "tikkurila")
+
+
+def get_predefined_palette(palette_ids: Union[list, tuple]) -> list:
     palette_paths = [__get_palette_path(x) for x in palette_ids]
     return parse_palette(','.join(palette_paths))
 
 
 def __get_palette_path(palette_id: str) -> str:
+    if palette_id not in PREDEFINED_PALETTES:
+        raise Exception(f"No palette found {palette_id}")
     return str(
         Path(os.path.realpath(__file__)).parent.absolute().joinpath(
             f"resources/{palette_id}-palette.json")
