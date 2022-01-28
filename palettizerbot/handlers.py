@@ -9,14 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 HARDCODED_PALETTE = [
-    {'color': (255, 0, 0), 'name': 'Red'},
-    {'color': (0, 255, 0), 'name': 'Green'},
-    {'color': (0, 0, 255), 'name': 'Blue'},
-    {'color': (255, 255, 0), 'name': 'Yellow'},
-    {'color': (0, 255, 255), 'name': 'Cyan'},
-    {'color': (255, 0, 255), 'name': 'Magenta'},
-    {'color': (255, 255, 255), 'name': 'White'},
-    {'color': (0, 0, 0), 'name': 'Black'},
+    {'color': (255, 0, 0), 'name': 'Red', 'vendor': 'Sample Colors'},
+    {'color': (0, 255, 0), 'name': 'Green', 'vendor': 'Sample Colors'},
+    {'color': (0, 0, 255), 'name': 'Blue', 'vendor': 'Sample Colors'},
+    {'color': (255, 255, 0), 'name': 'Yellow', 'vendor': 'Sample Colors'},
+    {'color': (0, 255, 255), 'name': 'Cyan', 'vendor': 'Sample Colors'},
+    {'color': (255, 0, 255), 'name': 'Magenta', 'vendor': 'Sample Colors'},
+    {'color': (255, 255, 255), 'name': 'White', 'vendor': 'Sample Colors'},
+    {'color': (0, 0, 0), 'name': 'Black', 'vendor': 'Sample Colors'},
 ]
 
 
@@ -67,8 +67,13 @@ def on_message_with_image(update: Update, context: CallbackContext):
         out_image, hist = quantize(image_as_bytearray, HARDCODED_PALETTE)
         logger.debug("Processing finished, sending the result to the chat")
         context.bot.send_document(chat_id=update.effective_chat.id,
-                                  document=image_to_bytes(out_image),
-                                  caption=str(hist))
+                                  document=image_to_bytes(out_image))
+        message_text = '\n'.join(
+            [f"{x['color']['vendor']} {x['color']['name']} (RGB {str(x['color']['color'])}) - {x['pixels']}"
+             for x in hist.values()]
+        )
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text=message_text)
     except Exception as e:
         raise IOError("Failed to process image", e)
 
