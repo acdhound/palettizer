@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 import logging
+from palettizer.quantize import quantize
 
 
 logger = logging.getLogger(__name__)
@@ -27,13 +28,19 @@ def handle_message_with_image(update: Update, context: CallbackContext):
 
     if not file.file_size:
         raise Exception("Can't define file size")
-    if file.file_size > 10 * 1024 * 1024:
+    if file.file_size > 5 * 1024 * 1024:
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="File must be less than 10 MB")
+                                 text="File must be less than 5 MB")
         return
-    bytes_array = file.download_as_bytearray()
-    # todo process the image here
-    logger.info("File of {} bytes was downloaded".format(len(bytes_array)))
-
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="The operation is not supported yet")
+    try:
+        image_as_bytearray = file.download_as_bytearray()
+        palette = [
+            {'color': (255, 0, 0), 'name': 'Red'},
+            {'color': (0, 255, 0), 'name': 'Green'},
+            {'color': (0, 0, 255), 'name': 'Blue'}
+        ]
+        out_image, hist = quantize(image_as_bytearray, palette, n_colors=0)
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text=str(hist))
+    except Exception as e:
+        raise IOError("Failed to read image from the message", e)

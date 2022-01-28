@@ -1,6 +1,7 @@
 import logging.config
 import os
 import yaml
+from pathlib import Path
 
 
 def configure_local():
@@ -10,11 +11,13 @@ def configure_local():
     )
 
 
-def configure(path):
+def configure(path=None):
     is_local = str(os.environ.get('LOCAL_SERVER')).lower() == 'true'
     if is_local:
         configure_local()
     else:
+        if path is None:
+            path = Path(os.path.realpath(__file__)).parent.absolute().joinpath("resources/logging.yaml")
         if os.path.exists(path):
             with open(path, 'rt') as f:
                 try:

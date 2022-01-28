@@ -1,11 +1,11 @@
 # todo this is a hack to configure logging before a logger is initialized in each imported module
-import initlogging
+from . import initlogging
 import logging
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
 from telegram.ext.filters import Filters
 import sys
-from handlers import handle_message_with_image
+from . handlers import handle_message_with_image
 
 
 logger = logging.getLogger(__name__)
@@ -45,8 +45,7 @@ def on_img(update: Update, context: CallbackContext):
 
 
 def on_reject(update: Update, context: CallbackContext):
-    raise Exception("Test exception")
-    # update.message.reply_text(text="Invalid message, type /start for help")
+    update.message.reply_text(text="Invalid message, type /start for help")
 
 
 def main():
