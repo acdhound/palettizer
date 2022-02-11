@@ -13,7 +13,8 @@ setup(
       'numpy',
       'imageio',
       'python-telegram-bot',
-      'pyyaml'
+      'pyyaml',
+      'faiss-cpu'
    ],
    python_requires=">=3.6",
    extras_require={

@@ -1,3 +1,4 @@
+import faiss
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
 from sklearn.cluster import KMeans
@@ -48,10 +49,21 @@ def quantize(img, palette, n_colors=0):
 
     if 0 < n_colors < len(palette):
         print("Reducing color space of the image to " + str(n_colors) + " colors")
-        kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array)
-        kmeans_palette = kmeans.cluster_centers_
-        kmeans_labels = kmeans.predict(image_array)
+        # kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array)
+        # kmeans_palette = kmeans.cluster_centers_
+        # kmeans_labels = kmeans.predict(image_array)
+        # kmeans_image, hist = recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
+        # image_array = image_to_flat_array(kmeans_image)
+        # image = kmeans_image
+
+        kmeans = faiss.Kmeans(d=image_array.shape[1], k=n_colors)
+        image_array_32 = image_array.astype(np.float32)
+        kmeans.train(image_array_32)
+        kmeans_palette = kmeans.centroids
+        kmeans_labels = kmeans.index.search(image_array_32, 1)[1]
+        kmeans_labels = [i[0] for i in kmeans_labels]
         kmeans_image, hist = recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
+        kmeans_image = kmeans_image.astype(np.float64)
         image_array = image_to_flat_array(kmeans_image)
         image = kmeans_image
 
