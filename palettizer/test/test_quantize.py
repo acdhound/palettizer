@@ -5,6 +5,7 @@ from testutils import get_test_resource
 
 
 IMAGE_4_SQUARES = str(get_test_resource("4_squares.png"))
+IMAGE_2_SQUARES = str(get_test_resource("2_squares.png"))
 IMAGE_BLISS = str(get_test_resource("bliss.jpg"))
 
 PALETTE_4_COLORS = [
@@ -57,30 +58,25 @@ def test_quantize__4_colors_palette():
 
 
 def test_quantize__4_colors_palette__max_2_colors():
-    output_img, histogram = quantize(img=IMAGE_4_SQUARES,
+    output_img, histogram = quantize(img=IMAGE_2_SQUARES,
                                      palette=PALETTE_4_COLORS,
                                      n_colors=2)
 
     assert output_img is not None
-    assert output_img.shape == (40, 40, 3)
+    assert output_img.shape == (20, 40, 3)
     assert output_img.dtype == np.uint8
-    assert np.array_equal(output_img[0][0], YELLOW)
-    assert np.array_equal(output_img[10][10], YELLOW)
-    assert np.array_equal(output_img[18][18], YELLOW)
+    assert np.array_equal(output_img[0][0], RED)
+    assert np.array_equal(output_img[10][10], RED)
+    assert np.array_equal(output_img[18][18], RED)
     assert np.array_equal(output_img[0][20], YELLOW)
     assert np.array_equal(output_img[10][30], YELLOW)
     assert np.array_equal(output_img[18][38], YELLOW)
-    assert np.array_equal(output_img[20][0], BLUE)
-    assert np.array_equal(output_img[30][10], BLUE)
-    assert np.array_equal(output_img[38][18], BLUE)
-    assert np.array_equal(output_img[20][20], YELLOW)
-    assert np.array_equal(output_img[30][30], YELLOW)
-    assert np.array_equal(output_img[38][38], YELLOW)
 
     assert histogram is not None
+    assert len(histogram.keys()) == 2
     assert {'color': {'color': (255, 255, 0), 'name': 'yellow', 'vendor': 'ABC Paints'},
-            'pixels': 1200} in histogram.values()
-    assert {'color': {'color': (0, 0, 255), 'name': 'blue', 'vendor': 'ABC Paints'},
+            'pixels': 400} in histogram.values()
+    assert {'color': {'color': (255, 0, 0), 'name': 'red', 'vendor': 'ABC Paints'},
             'pixels': 400} in histogram.values()
 
 
