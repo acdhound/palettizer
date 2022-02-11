@@ -7,7 +7,22 @@ Palettizer is a simple tool designed to reduce images' color space to a given pa
 
 ## Usage
 
-First install all required packages. Run from the project root directory:
+First clone the repository
+
+```bash
+git clone https://github.com/acdhound/palettizer.git
+cd ./palettizer
+```
+
+Then create and activate virtual env
+
+```bash
+pip install virtualenv
+virtualenv venv
+./venv/Scripts/activate
+```
+
+Install all required packages:
 
 ```shell
 pip install .
