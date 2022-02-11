@@ -17,9 +17,17 @@ cd ./palettizer
 Then create and activate virtual env
 
 ```bash
+# Unix
 pip install virtualenv
 virtualenv venv
-./venv/Scripts/activate
+source ./venv/bin/activate
+```
+
+```cmd
+REM Windows
+pip install virtualenv
+virtualenv venv
+\venv\Scripts\activate.bat
 ```
 
 Install all required packages:
