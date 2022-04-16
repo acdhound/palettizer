@@ -27,7 +27,7 @@ source ./venv/bin/activate
 REM Windows
 pip install virtualenv
 virtualenv venv
-\venv\Scripts\activate.bat
+venv\Scripts\activate.bat
 ```
 
 Install all required packages:
