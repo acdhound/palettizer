@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Palettizer</title>
+    <style>
+        .color-block {
+          display: block;
+          width: 20px;
+          height: 20px;
+        }
+        .picture {
+          max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<img class="picture" src="data:image/png;base64,{{ img_base64 }}">
+
+
+<table>
+    <tbody>
+        <tr>
+            <th>Color</th>
+            <th>Name</th>
+            <th>Area occupied, %</th>
+        </tr>
+        <tr>
+            <td><div class="color-block" style="background-color: #ff0000"></div></td>
+            <td>Red</td>
+            <td>100</td>
+        </tr>
+    </tbody>
+</table>
+
+
+</body>
+</html>
