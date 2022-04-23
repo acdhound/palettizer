@@ -6,7 +6,7 @@ setup(
    description='',
    author='Alexander Ivanov',
    author_email='adivanov95@gmail.com',
-   packages=['palettizer', 'palettizerbot'],
+   packages=['palettizer', 'palettizer.templates', 'palettizerbot'],
    install_requires=[
       'scikit-image >= 0.19.1',
       'scikit-learn >= 1.0.2',
@@ -23,5 +23,6 @@ setup(
    },
    package_data={
         "": ["resources/*.*"],
+        "palettizer.templates": ["*.*"]
     }
 )

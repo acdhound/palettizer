@@ -1,9 +1,7 @@
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, FunctionLoader, select_autoescape
 import numpy as np
 from . imgutils import np_image_to_base64
-
-
-__ENV = Environment(loader=PackageLoader("palettizer"), autoescape=select_autoescape())
+from importlib import resources
 
 
 def image_and_palette_as_html(image: np.ndarray, palette_hist: dict):
@@ -13,6 +11,17 @@ def image_and_palette_as_html(image: np.ndarray, palette_hist: dict):
         "colors": palette_hist})
 
 
+def __load_template(name: str) -> str:
+    try:
+        return resources.read_text("palettizer.templates", name)
+    except Exception as e:
+        raise Exception(f"Failed to load template: ${name}") from e
+
+
+__ENV = Environment(loader=FunctionLoader(__load_template), autoescape=select_autoescape())
+
+
 def __render_template(template: str, variables: dict):
-    template = __ENV.get_template(template)
+    env = Environment(loader=FunctionLoader(__load_template), autoescape=select_autoescape())
+    template = env.get_template(template)
     return template.render(variables)
