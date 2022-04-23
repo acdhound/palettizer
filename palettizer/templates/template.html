@@ -26,11 +26,16 @@
             <th>Name</th>
             <th>Area occupied, %</th>
         </tr>
+
+        {% for id, item in colors.items() %}
+
         <tr>
-            <td><div class="color-block" style="background-color: #ff0000"></div></td>
-            <td>Red</td>
-            <td>100</td>
+            <td><div class="color-block" style="background-color: rgb{{ item['color']['color'] }}"></div></td>
+            <td>{{ item["color"]["name"] }}</td>
+            <td>{{ item["pixels"] }}</td>
         </tr>
+
+        {% endfor %}
     </tbody>
 </table>
 
