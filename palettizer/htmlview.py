@@ -22,6 +22,5 @@ __ENV = Environment(loader=FunctionLoader(__load_template), autoescape=select_au
 
 
 def __render_template(template: str, variables: dict):
-    env = Environment(loader=FunctionLoader(__load_template), autoescape=select_autoescape())
-    template = env.get_template(template)
+    template = __ENV.get_template(template)
     return template.render(variables)
