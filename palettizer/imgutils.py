@@ -4,6 +4,7 @@ from skimage import io
 from skimage.util import img_as_ubyte
 from typing import Union
 from io import BytesIO
+import base64
 
 
 def read_rgb_image(path: Union[str, bytes, bytearray]) -> np.ndarray:
@@ -31,3 +32,11 @@ def image_to_bytes(img: np.ndarray, file_format='png') -> bytes:
         imageio.imwrite(buf, img, format=file_format)
         image_bin = buf.getvalue()
     return image_bin
+
+
+def np_image_to_base64(img: np.ndarray, img_format: str):
+    with BytesIO() as buf:
+        imageio.imwrite(buf, img, format=img_format)
+        image_bin = buf.getvalue()
+        image_b64 = base64.b64encode(image_bin).decode("utf-8")
+        return image_b64

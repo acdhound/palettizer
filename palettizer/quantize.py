@@ -2,6 +2,7 @@ import faiss
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
 from sklearn.cluster import KMeans
+from typing import Union
 from . imgutils import read_rgb_image
 
 
@@ -10,7 +11,7 @@ def image_to_flat_array(img):
     return np.reshape(img, (w * h, d))
 
 
-def recreate_image(codebook, labels, w, h, palette=None):
+def recreate_image(codebook, labels, w, h, palette=None) -> (np.ndarray, dict):
     """Recreate the (compressed) image from the code book & labels"""
     d = codebook.shape[1]
     image = np.zeros(shape=(w, h, d), dtype=codebook.dtype)
@@ -31,7 +32,7 @@ def recreate_image(codebook, labels, w, h, palette=None):
     return image, palette_histogram
 
 
-def quantize(img, palette, n_colors=0):
+def quantize(img: Union[str, bytes, bytearray], palette: list, n_colors=0) -> (np.ndarray, dict):
     codebook_palette = np.zeros((len(palette), 3), dtype=np.float64)
     codebook_palette_uint8 = np.zeros((len(palette), 3), dtype=np.uint8)
     i = 0

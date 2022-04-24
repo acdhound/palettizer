@@ -5,6 +5,7 @@ from palettizer.quantize import quantize
 from palettizer.imgutils import image_to_bytes
 from palettizer.palette import get_predefined_palette
 from palettizer.palette import PREDEFINED_PALETTES
+from palettizer.htmlview import image_and_palette_as_html
 
 
 logger = logging.getLogger(__name__)
@@ -69,20 +70,18 @@ def on_message_with_image(update: Update, context: CallbackContext):
                                    palette=get_predefined_palette(palette_ids),
                                    n_colors=n_colors)
     except Exception as e:
-        raise IOError("Failed to process image", e)
+        raise IOError("Failed to process image") from e
 
     try:
         logger.debug("Processing finished, sending the result to the chat")
         context.bot.send_document(chat_id=update.effective_chat.id,
                                   document=image_to_bytes(out_image))
-        response_text = '\n'.join(
-            [f"{x['color']['vendor']} {x['color']['name']} (RGB {str(x['color']['color'])}) - {x['pixels']}"
-             for x in hist.values()]
-        )
-        context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text=response_text)
+        response_html = image_and_palette_as_html(out_image, hist)
+        context.bot.send_document(chat_id=update.effective_chat.id,
+                                  document=str.encode(response_html),
+                                  filename="result.html")
     except Exception as e:
-        raise Exception("Failed to send response to chat", e)
+        raise Exception("Failed to send response to chat") from e
 
 
 def __parse_params_from_message(update: Update) -> (list, int):
