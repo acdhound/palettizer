@@ -15,7 +15,7 @@ setup(
       'python-telegram-bot',
       'pyyaml >= 6.0',
       'faiss-cpu >= 1.7.2',
-      'Jinja2'
+      'Jinja2 >= 3.1.1'
    ],
    python_requires=">=3.6",
    extras_require={
