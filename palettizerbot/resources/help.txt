@@ -12,8 +12,8 @@
     - Write the palette IDs you need separated by comma (see the full list above)
     - Write the maximum number of colors you'd like to use, if needed
     - Examples:
-    *  arton,mtn94
-    *  arton,mtn94 15
-    *  mtnblack,mtn94
-    *  tikkurila 50
+       arton,mtn94
+       arton,mtn94 15
+       mtnblack,mtn94
+       tikkurila 50
     - Send the message and wait a couple of minutes. I'll pick up the colors for you.
