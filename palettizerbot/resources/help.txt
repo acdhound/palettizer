@@ -1,0 +1,19 @@
+  Hi, I'm Palettizer bot!
+
+  If you're an artist, I can tell you what colors and how much of them you need to paint anything - just give me a photo or sketch.
+  Currently I support several color palettes from large paint manufacturers:
+    - Montana Black (ID mtnblack)
+    - Montana 94 (ID mtn94)
+    - Arton (ID arton)
+    - Tikkurila (ID tikkurila)
+
+  How to use me:
+    - Attach your sketch to the message
+    - Write the palette IDs you need separated by comma (see the full list above)
+    - Write the maximum number of colors you'd like to use, if needed
+    - Examples:
+    *  arton,mtn94
+    *  arton,mtn94 15
+    *  mtnblack,mtn94
+    *  tikkurila 50
+    - Send the message and wait a couple of minutes. I'll pick up the colors for you.

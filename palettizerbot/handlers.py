@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import CallbackContext
 import logging
+from importlib import resources
 from palettizer.quantize import quantize
 from palettizer.imgutils import image_to_bytes
 from palettizer.palette import get_predefined_palette
@@ -111,23 +112,9 @@ def __parse_params_from_message(update: Update) -> (list, int):
 
 
 def on_start_command(update: Update, context: CallbackContext):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="""
-  Hi, I'm Palettizer bot!
+    try:
+        text = resources.read_text("palettizerbot.resources", "help.txt")
+    except Exception as e:
+        raise Exception(f"Failed to help.txt from resources") from e
 
-  I can decompose an image by a given color palette.
-  My mission is to help artists who do large-scaled murals and want to chose the right colors from a palette provided by a paint vendor.
-  Just send me a sketch for your future painting and select the palettes you'd like to use and I will show you which colors and in what proportion fit the most.
-
-  Currently supported palettes (use their IDs to select palettes as described below):
-    - Montana Black (ID mtnblack)
-    - Montana 94 (ID mtn94)
-    - Arton (ID arton)
-    - Tikkurila (ID tikkurila)
-
-  How to use me:
-    - Attach your sketch to the message
-    - Write the palette IDs you need separated by comma (see the full list above)
-    - Write the maximum number of colors you'd like to use (default is 30)
-    - The full message should look like this: arton,mtn94 15
-    - Send the message and wait a couple of minutes. I'll pick up the colors for you.
-    """)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text)
