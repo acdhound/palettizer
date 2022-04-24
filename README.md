@@ -5,7 +5,7 @@ Palettizer is a simple tool designed to reduce images' color space to a given pa
 * python 3
 * pip
 
-## Usage
+## Installation
 
 First clone the repository
 
@@ -36,7 +36,22 @@ Install all required packages:
 pip install .
 ```
 
-Then run Palettizer by the following command:
+## Usage
+
+### Telegram bot
+
+After project installation is complete you can start Telegram bot locally:
+
+```
+python -m palettizerbot <Telgram bot token>
+```
+
+To find out more about tokens and creation of a Telegram bot see [Telegram Bot API documentation](https://core.telegram.org/bots#6-botfather). <br>
+To get more information on usage of the bot type "/start" into the chat.
+
+### CLI tool
+
+You can use Palettizer CLI by the following command:
 
 ```
 # Unix
