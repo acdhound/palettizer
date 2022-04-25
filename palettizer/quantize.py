@@ -5,6 +5,8 @@ from sklearn.cluster import KMeans
 from typing import Union
 from . imgutils import read_rgb_image
 
+DEFAULT_N_COLORS = 50
+
 
 def image_to_flat_array(img):
     w, h, d = tuple(img.shape)
@@ -23,7 +25,10 @@ def recreate_image(codebook, labels, w, h, palette=None) -> (np.ndarray, dict):
             image[i][j] = codebook[label]
             if label not in palette_histogram:
                 if palette is None:
-                    palette_histogram[label] = {'color': codebook[label], 'pixels': 1}
+                    palette_histogram[label] = {
+                        'color': {'color': __color_as_tuple(codebook[label]), 'name': '', 'vendor': ''},
+                        'pixels': 1
+                    }
                 else:
                     palette_histogram[label] = {'color': palette[label], 'pixels': 1}
             else:
@@ -32,23 +37,20 @@ def recreate_image(codebook, labels, w, h, palette=None) -> (np.ndarray, dict):
     return image, palette_histogram
 
 
-def quantize(img: Union[str, bytes, bytearray], palette: list, n_colors=0) -> (np.ndarray, dict):
-    codebook_palette = np.zeros((len(palette), 3), dtype=np.float64)
-    codebook_palette_uint8 = np.zeros((len(palette), 3), dtype=np.uint8)
-    i = 0
-    for clr in palette:
-        codebook_palette[i][0] = float(clr["color"][0]) / 255
-        codebook_palette[i][1] = float(clr["color"][1]) / 255
-        codebook_palette[i][2] = float(clr["color"][2]) / 255
-        codebook_palette_uint8[i][0] = clr["color"][0]
-        codebook_palette_uint8[i][1] = clr["color"][1]
-        codebook_palette_uint8[i][2] = clr["color"][2]
-        i = i + 1
+def __color_as_tuple(color: np.ndarray) -> tuple:
+    return color[0], color[1], color[2]
 
+
+def quantize(img: Union[str, bytes, bytearray], palette: list = None, n_colors=0) -> (np.ndarray, dict):
     image = read_rgb_image(img)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
-    if 0 < n_colors < len(palette):
+    no_palette = palette is None or len(palette) == 0
+
+    if no_palette or (0 < n_colors < len(palette)):
+        if n_colors <= 0:
+            n_colors = DEFAULT_N_COLORS
+
         print("Reducing color space of the image to " + str(n_colors) + " colors")
         # kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array)
         # kmeans_palette = kmeans.cluster_centers_
@@ -63,10 +65,26 @@ def quantize(img: Union[str, bytes, bytearray], palette: list, n_colors=0) -> (n
         kmeans_palette = kmeans.centroids
         kmeans_labels = kmeans.index.search(image_array_32, 1)[1]
         kmeans_labels = [i[0] for i in kmeans_labels]
+        if no_palette:
+            kmeans_palette = (kmeans_palette * 255.0).astype(np.uint8)
+            return recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
+
         kmeans_image, hist = recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
         kmeans_image = kmeans_image.astype(np.float64)
         image_array = image_to_flat_array(kmeans_image)
         image = kmeans_image
+
+    codebook_palette = np.zeros((len(palette), 3), dtype=np.float64)
+    codebook_palette_uint8 = np.zeros((len(palette), 3), dtype=np.uint8)
+    i = 0
+    for clr in palette:
+        codebook_palette[i][0] = float(clr["color"][0]) / 255
+        codebook_palette[i][1] = float(clr["color"][1]) / 255
+        codebook_palette[i][2] = float(clr["color"][2]) / 255
+        codebook_palette_uint8[i][0] = clr["color"][0]
+        codebook_palette_uint8[i][1] = clr["color"][1]
+        codebook_palette_uint8[i][2] = clr["color"][2]
+        i = i + 1
 
     print("Converting image colors to the palette")
     labels_palette = pairwise_distances_argmin(codebook_palette, image_array, axis=0)

@@ -150,3 +150,34 @@ def test_quantize__binary_image():
             'pixels': 400} in histogram.values()
     assert {'color': {'color': (0, 0, 255), 'name': 'blue', 'vendor': 'ABC Paints'},
             'pixels': 400} in histogram.values()
+
+
+def test_quantize__no_palette():
+    output_img, histogram = quantize(img=IMAGE_4_SQUARES,
+                                     palette=None,
+                                     n_colors=4)
+
+    assert output_img is not None
+    assert output_img.shape == (40, 40, 3)
+    assert output_img.dtype == np.uint8
+    red = output_img[0][0]
+    assert red[0] > red[1] and red[0] > red[2]
+    assert np.array_equal(output_img[10][10], red)
+    assert np.array_equal(output_img[18][18], red)
+    yellow = output_img[0][20]
+    assert yellow[0] > yellow[2] and yellow[1] > yellow[2]
+    assert np.array_equal(output_img[10][30], yellow)
+    assert np.array_equal(output_img[18][38], yellow)
+    blue = output_img[20][0]
+    assert blue[2] > blue[0] and blue[2] > blue[1]
+    assert np.array_equal(output_img[30][10], blue)
+    assert np.array_equal(output_img[38][18], blue)
+    green = output_img[20][20]
+    assert green[1] > green[0] and green[1] > green[2]
+    assert np.array_equal(output_img[30][30], green)
+    assert np.array_equal(output_img[38][38], green)
+
+    assert histogram is not None
+    assert len(histogram.values()) == 4
+    for k in histogram:
+        assert histogram[k]['pixels'] == 400
