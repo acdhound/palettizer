@@ -86,11 +86,17 @@ def on_message_with_image(update: Update, context: CallbackContext):
 
 
 def __parse_params_from_message(update: Update) -> (list, int):
-    palette_ids = [PREDEFINED_PALETTES[0]]
+    palette_ids = []
     n_colors = 0
 
     caption = update.message.caption
     if caption and len(caption) > 0:
+        try:
+            n_colors = __parse_n_colors(caption)
+            return palette_ids, n_colors
+        except ParseParameterException as e:
+            logger.debug(e)
+
         params = caption.split(' ')
         if len(params) >= 1:
             palette_ids = params[0].split(',')
@@ -100,15 +106,20 @@ def __parse_params_from_message(update: Update) -> (list, int):
                 raise ParseParameterException(f'Unknown palette ID: {p}, expected one of the following: {PREDEFINED_PALETTES}')
 
         if len(params) >= 2:
-            try:
-                n_colors = int(params[1])
-            except Exception as e:
-                logger.debug(e)
-                raise ParseParameterException(f'Invalid parameter {params[1]}, a positive integer expected')
-            if n_colors < 0:
-                raise ParseParameterException(f'Invalid number of colors {n_colors}, a positive integer expected')
+            n_colors = __parse_n_colors(params[1])
 
     return palette_ids, n_colors
+
+
+def __parse_n_colors(input_str: str) -> int:
+    try:
+        n_colors = int(input_str)
+    except Exception as e:
+        logger.debug(e)
+        raise ParseParameterException(f'Invalid parameter {input_str}, a positive integer expected')
+    if n_colors < 0:
+        raise ParseParameterException(f'Invalid number of colors {n_colors}, a positive integer expected')
+    return n_colors
 
 
 def on_start_command(update: Update, context: CallbackContext):

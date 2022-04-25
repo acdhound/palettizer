@@ -8,6 +8,8 @@ PREDEFINED_PALETTES = ("mtnblack", "mtn94", "arton", "tikkurila")
 
 
 def get_predefined_palette(palette_ids: Union[list, tuple]) -> list:
+    if not palette_ids:
+        return []
     palette_paths = [__get_palette_path(x) for x in palette_ids]
     return parse_palette(','.join(palette_paths))
 
