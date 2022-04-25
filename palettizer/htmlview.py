@@ -6,11 +6,13 @@ from importlib import resources
 
 def image_and_palette_as_html(image: np.ndarray, palette_hist: dict):
     colors_sorted = sorted(palette_hist.values(), key=lambda i: i['pixels'], reverse=True)
-    colors_percentage = map(lambda i: __pixels_to_percentage(i, image), colors_sorted)
+    colors_percentage = list(map(lambda i: __pixels_to_percentage(i, image), colors_sorted))
+    max_percentage = max(map(lambda i: i['percentage'], colors_percentage))
     img_base64 = np_image_to_base64(image, "jpg")
     return __render_template("template.html", {
         "image": {"format": "jpg", "base64": img_base64},
-        "colors": colors_percentage})
+        "colors": colors_percentage,
+        "max_percentage": max_percentage})
 
 
 def __load_template(name: str) -> str:

@@ -28,12 +28,16 @@ def test_image_and_palette_as_html():
     assert rendered_html is not None
     assert len(rendered_html) > 100000
     assert "<td><div class=\"color-block\" style=\"background-color: rgb(255, 0, 0)\"></div></td>" in rendered_html
+    assert "<div class=\"color-block\" style=\"background-color: rgb(255, 0, 0); width: 200.0px\">" in rendered_html
     assert "<td>red</td>" in rendered_html
     assert "<td><div class=\"color-block\" style=\"background-color: rgb(255, 255, 0)\"></div></td>" in rendered_html
+    assert "<div class=\"color-block\" style=\"background-color: rgb(255, 255, 0); width: 200.0px\">" in rendered_html
     assert "<td>yellow</td>" in rendered_html
     assert "<td><div class=\"color-block\" style=\"background-color: rgb(0, 255, 0)\"></div></td>" in rendered_html
+    assert "<div class=\"color-block\" style=\"background-color: rgb(0, 255, 0); width: 200.0px\">" in rendered_html
     assert "<td>green</td>" in rendered_html
     assert "<td><div class=\"color-block\" style=\"background-color: rgb(0, 0, 255)\"></div></td>" in rendered_html
+    assert "<div class=\"color-block\" style=\"background-color: rgb(0, 0, 255); width: 200.0px\">" in rendered_html
     assert "<td>blue</td>" in rendered_html
     assert "<td>25.0</td>" in rendered_html
 
