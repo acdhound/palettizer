@@ -1,13 +1,19 @@
 # Palettizer
-Palettizer is a simple tool designed to reduce images' color space to a given palette. 
+Palettizer is a tool designed to help artists choose the right colors from a given palette to paint a given picture.
+This diagram shows how it works:
 
-## Requirements
-* python 3
-* pip
+![](./assets/how-it-works.png)
+
+You can use it via CLI or Telegram bot.
+Telegram bot isn't publicly available yet, but you can run it locally, see [Telegram Bot](#telegram-bot)
 
 ## Installation
 
-First clone the repository
+First, make sure you have this installed on your machine:
+* python 3
+* pip
+
+Clone the repository
 
 ```bash
 git clone https://github.com/acdhound/palettizer.git
