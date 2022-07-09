@@ -31,10 +31,10 @@
         {% for item in colors %}
 
         <tr>
-            <td><div class="color-block" style="background-color: rgb{{ item['color']['color'] }}"></div></td>
+            <td><div class="color-block" style="background-color: rgb({{ item['color'].r }}, {{ item['color'].g }}, {{ item['color'].b }})"></div></td>
             <td>{{ item["color"]["name"] }}</td>
             <td>{{ item["percentage"] }}</td>
-            <td><div class="color-block" style="background-color: rgb{{ item['color']['color'] }}; width: {{ (item['percentage'] / max_percentage) * 200.00 }}px"></div></td>
+            <td><div class="color-block" style="background-color: rgb({{ item['color'].r }}, {{ item['color'].g }}, {{ item['color'].b }}); width: {{ (item['percentage'] / max_percentage) * 200.00 }}px"></div></td>
         </tr>
 
         {% endfor %}
