@@ -38,6 +38,9 @@ class Palette:
     def __init__(self, colors: list[Color] = None):
         self.colors = [] if colors is None else colors
 
+    def size(self):
+        return len(self.colors)
+
     @staticmethod
     def from_file(path: str):
         return Palette.from_files([path])
