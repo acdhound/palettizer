@@ -40,3 +40,8 @@ def np_image_to_base64(img: np.ndarray, img_format: str):
         image_bin = buf.getvalue()
         image_b64 = base64.b64encode(image_bin).decode("utf-8")
         return image_b64
+
+
+def np_image_to_flat_array(img: np.ndarray):
+    w, h, d = tuple(img.shape)
+    return np.reshape(img, (w * h, d))

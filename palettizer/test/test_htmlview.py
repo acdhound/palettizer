@@ -2,6 +2,7 @@ from palettizer.htmlview import image_and_palette_as_html
 from palettizer.imgutils import read_rgb_image
 from palettizer.quantize import quantize
 from palettizer.palette import Palette, Color
+from palettizer.quantize import QuantizedImage
 from testutils import get_test_resource
 
 
@@ -16,14 +17,9 @@ IMAGE_PATH = str(get_test_resource("bliss.jpg"))
 def test_image_and_palette_as_html():
     img = read_rgb_image(IMAGE_PATH)
     area = (img.shape[0] * img.shape[1]) // 4
-    colors = {
-        1: {'color': RED, "pixels": area},
-        2: {'color': YELLOW, "pixels": area},
-        3: {'color': GREEN, "pixels": area},
-        4: {'color': BLUE, "pixels": area}
-    }
+    q_image = QuantizedImage(img, {RED: area, YELLOW: area, GREEN: area, BLUE: area})
 
-    rendered_html = image_and_palette_as_html(img, colors)
+    rendered_html = image_and_palette_as_html(q_image)
 
     assert rendered_html is not None
     assert len(rendered_html) > 100000
@@ -43,9 +39,9 @@ def test_image_and_palette_as_html():
 
 
 def test_image_and_palette_as_html__with_quantize():
-    img, colors = quantize(IMAGE_PATH, PALETTE)
+    q_image = quantize(IMAGE_PATH, PALETTE)
 
-    rendered_html = image_and_palette_as_html(img, colors)
+    rendered_html = image_and_palette_as_html(q_image)
 
     assert rendered_html is not None
     assert len(rendered_html) > 100000

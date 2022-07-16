@@ -66,17 +66,17 @@ def on_message_with_image(update: Update, context: CallbackContext):
 
     try:
         logger.debug("Processing image file from the message")
-        out_image, hist = quantize(img=image_as_bytearray,
-                                   palette=Palette.from_predefined(palette_ids),
-                                   n_colors=n_colors)
+        q_image = quantize(img=image_as_bytearray,
+                           palette=Palette.from_predefined(palette_ids),
+                           n_colors=n_colors)
     except Exception as e:
         raise IOError("Failed to process image") from e
 
     try:
         logger.debug("Processing finished, sending the result to the chat")
         context.bot.send_document(chat_id=update.effective_chat.id,
-                                  document=image_to_bytes(out_image))
-        response_html = image_and_palette_as_html(out_image, hist)
+                                  document=image_to_bytes(q_image.image))
+        response_html = image_and_palette_as_html(q_image)
         context.bot.send_document(chat_id=update.effective_chat.id,
                                   document=str.encode(response_html),
                                   filename="result.html")
@@ -102,7 +102,8 @@ def __parse_params_from_message(update: Update) -> (list, int):
 
         for p in palette_ids:
             if p not in Palette.PREDEFINED_PALETTES:
-                raise ParseParameterException(f'Unknown palette ID: {p}, expected one of the following: {Palette.PREDEFINED_PALETTES}')
+                raise ParseParameterException(
+                    f'Unknown palette ID: {p}, expected one of the following: {Palette.PREDEFINED_PALETTES}')
 
         if len(params) >= 2:
             n_colors = __parse_n_colors(params[1])

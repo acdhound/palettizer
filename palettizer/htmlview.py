@@ -1,14 +1,16 @@
 from jinja2 import Environment, FunctionLoader, select_autoescape
 import numpy as np
 from . imgutils import np_image_to_base64
+from . palette import Color
+from . quantize import QuantizedImage
 from importlib import resources
 
 
-def image_and_palette_as_html(image: np.ndarray, palette_hist: dict):
-    colors_sorted = sorted(palette_hist.values(), key=lambda i: i['pixels'], reverse=True)
-    colors_percentage = list(map(lambda i: __pixels_to_percentage(i, image), colors_sorted))
+def image_and_palette_as_html(q_image: QuantizedImage):
+    colors_sorted = sorted(q_image.color_pixels.items(), key=lambda i: i[1], reverse=True)
+    colors_percentage = list(map(lambda i: __pixels_to_percentage(i, q_image.image), colors_sorted))
     max_percentage = max(map(lambda i: i['percentage'], colors_percentage))
-    img_base64 = np_image_to_base64(image, "jpg")
+    img_base64 = np_image_to_base64(q_image.image, "jpg")
     return __render_template("template.html", {
         "image": {"format": "jpg", "base64": img_base64},
         "colors": colors_percentage,
@@ -30,6 +32,6 @@ def __render_template(template: str, variables: dict):
     return template.render(variables)
 
 
-def __pixels_to_percentage(color: dict, img: np.ndarray) -> dict:
-    percentage = (color['pixels'] * 100.00) / (img.shape[0] * img.shape[1])
-    return {'color': color['color'], 'percentage': percentage}
+def __pixels_to_percentage(color_pixel: tuple[Color, int], img: np.ndarray) -> dict:
+    percentage = (color_pixel[1] * 100.00) / (img.shape[0] * img.shape[1])
+    return {'color': color_pixel[0], 'percentage': percentage}
