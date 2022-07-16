@@ -27,7 +27,7 @@ def recreate_image(codebook, labels, w, h, palette: Palette = None) -> (np.ndarr
             if label not in palette_histogram:
                 if palette is None:
                     palette_histogram[label] = {
-                        'color': {'color': __to_color(codebook[label]), 'name': '', 'vendor': ''},
+                        'color': Color(codebook[label][0], codebook[label][1], codebook[label][2]),
                         'pixels': 1
                     }
                 else:
@@ -38,11 +38,7 @@ def recreate_image(codebook, labels, w, h, palette: Palette = None) -> (np.ndarr
     return image, palette_histogram
 
 
-def __to_color(color: np.ndarray) -> Color:
-    return Color(color[0], color[1], color[2])
-
-
-def quantize(img: Union[str, bytes, bytearray], palette: Palette, n_colors=0) -> (np.ndarray, dict):
+def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_colors=0) -> (np.ndarray, dict):
     image = read_rgb_image(img)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 

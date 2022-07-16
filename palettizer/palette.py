@@ -59,7 +59,7 @@ class Palette:
     @staticmethod
     def from_predefined(palette_ids: Union[list, tuple]):
         if not palette_ids:
-            return []
+            return None
         palette_paths = [Palette.__get_palette_path(x) for x in palette_ids]
         return Palette.from_files(palette_paths)
 

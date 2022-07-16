@@ -1,7 +1,7 @@
   Hi, I'm Palettizer bot!
 
   If you're an artist, I can tell you what colors and how much of them you need to paint anything - just give me a photo or sketch.
-  Currently I support several color palettes from large paint manufacturers:
+  You can chose from the available color palettes or let me crate a palette from the picture. Currently I support several color palettes from well-known paint manufacturers:
     - Montana Black (ID mtnblack)
     - Montana 94 (ID mtn94)
     - Arton (ID arton)
