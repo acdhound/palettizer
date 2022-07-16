@@ -4,7 +4,9 @@ from sklearn.metrics import pairwise_distances_argmin
 from sklearn.cluster import KMeans
 from typing import Union
 from . imgutils import read_rgb_image
-from . palette import Palette
+from . palette import Palette, Color
+
+DEFAULT_N_COLORS = 50
 
 
 def image_to_flat_array(img):
@@ -24,7 +26,10 @@ def recreate_image(codebook, labels, w, h, palette: Palette = None) -> (np.ndarr
             image[i][j] = codebook[label]
             if label not in palette_histogram:
                 if palette is None:
-                    palette_histogram[label] = {'color': codebook[label], 'pixels': 1}
+                    palette_histogram[label] = {
+                        'color': Color(codebook[label][0], codebook[label][1], codebook[label][2]),
+                        'pixels': 1
+                    }
                 else:
                     palette_histogram[label] = {'color': palette.colors[label], 'pixels': 1}
             else:
@@ -33,19 +38,16 @@ def recreate_image(codebook, labels, w, h, palette: Palette = None) -> (np.ndarr
     return image, palette_histogram
 
 
-def quantize(img: Union[str, bytes, bytearray], palette: Palette, n_colors=0) -> (np.ndarray, dict):
-    codebook_palette = np.zeros((palette.size(), 3), dtype=np.float64)
-    codebook_palette_uint8 = np.zeros((palette.size(), 3), dtype=np.uint8)
-    i = 0
-    for clr in palette.colors:
-        np.put(codebook_palette[i], [0, 1, 2], [float(clr.r) / 255, float(clr.g) / 255, float(clr.b) / 255])
-        np.put(codebook_palette_uint8[i], [0, 1, 2], [clr.r, clr.g, clr.b])
-        i = i + 1
-
+def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_colors=0) -> (np.ndarray, dict):
     image = read_rgb_image(img)
     image_array = image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
-    if 0 < n_colors < palette.size():
+    no_palette = palette is None or palette.size() == 0
+
+    if no_palette or (0 < n_colors < palette.size()):
+        if n_colors <= 0:
+            n_colors = DEFAULT_N_COLORS
+
         print("Reducing color space of the image to " + str(n_colors) + " colors")
         # kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array)
         # kmeans_palette = kmeans.cluster_centers_
@@ -60,12 +62,23 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette, n_colors=0) ->
         kmeans_palette = kmeans.centroids
         kmeans_labels = kmeans.index.search(image_array_32, 1)[1]
         kmeans_labels = [i[0] for i in kmeans_labels]
+        if no_palette:
+            kmeans_palette = (kmeans_palette * 255.0).astype(np.uint8)
+            return recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
+
         kmeans_image, hist = recreate_image(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
         kmeans_image = kmeans_image.astype(np.float64)
         image_array = image_to_flat_array(kmeans_image)
         image = kmeans_image
 
     print("Converting image colors to the palette")
+    codebook_palette = np.zeros((palette.size(), 3), dtype=np.float64)
+    codebook_palette_uint8 = np.zeros((palette.size(), 3), dtype=np.uint8)
+    i = 0
+    for clr in palette.colors:
+        np.put(codebook_palette[i], [0, 1, 2], [float(clr.r) / 255, float(clr.g) / 255, float(clr.b) / 255])
+        np.put(codebook_palette_uint8[i], [0, 1, 2], [clr.r, clr.g, clr.b])
+        i = i + 1
     labels_palette = pairwise_distances_argmin(codebook_palette, image_array, axis=0)
 
     return recreate_image(codebook_palette_uint8, labels_palette, image.shape[0], image.shape[1], palette)
