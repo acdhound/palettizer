@@ -4,8 +4,7 @@ import logging
 from importlib import resources
 from palettizer.quantize import quantize
 from palettizer.imgutils import image_to_bytes
-from palettizer.palette import get_predefined_palette
-from palettizer.palette import PREDEFINED_PALETTES
+from palettizer.palette import Palette
 from palettizer.htmlview import image_and_palette_as_html
 
 
@@ -68,7 +67,7 @@ def on_message_with_image(update: Update, context: CallbackContext):
     try:
         logger.debug("Processing image file from the message")
         out_image, hist = quantize(img=image_as_bytearray,
-                                   palette=get_predefined_palette(palette_ids),
+                                   palette=Palette.from_predefined(palette_ids),
                                    n_colors=n_colors)
     except Exception as e:
         raise IOError("Failed to process image") from e
@@ -102,8 +101,8 @@ def __parse_params_from_message(update: Update) -> (list, int):
             palette_ids = params[0].split(',')
 
         for p in palette_ids:
-            if p not in PREDEFINED_PALETTES:
-                raise ParseParameterException(f'Unknown palette ID: {p}, expected one of the following: {PREDEFINED_PALETTES}')
+            if p not in Palette.PREDEFINED_PALETTES:
+                raise ParseParameterException(f'Unknown palette ID: {p}, expected one of the following: {Palette.PREDEFINED_PALETTES}')
 
         if len(params) >= 2:
             n_colors = __parse_n_colors(params[1])
