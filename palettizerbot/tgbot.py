@@ -57,6 +57,9 @@ def on_query(update: Update, context: CallbackContext):
 
 
 def on_text(update: Update, context: CallbackContext):
+    if __get_picture_from_context(context) is None:
+        on_start(update, context)
+        return
     try:
         n_colors: int = int(update.message.text)
     except Exception as e:
@@ -135,7 +138,9 @@ def __do_processing_and_send_result(update: Update, context: CallbackContext):
         raise Exception("Failed to send the results to the chat") from e
 
 
-def __get_picture_from_context(context: CallbackContext):
+def __get_picture_from_context(context: CallbackContext) -> Optional[Union[bytes, bytearray]]:
+    if "picture" not in context.user_data:
+        return None
     picture = context.user_data["picture"]
     if not isinstance(picture, bytes) and not isinstance(picture, bytearray):
         raise Exception("Can't get the picture from the context")

@@ -3,7 +3,7 @@ from . import initlogging
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler
 from telegram.ext.filters import Filters
 import sys
-from . handlers2 import on_start, on_error, on_picture, on_query, on_text
+from . tgbot import on_start, on_error, on_picture, on_query, on_text
 import logging
 
 
