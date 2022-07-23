@@ -1,9 +1,13 @@
 # todo this is a hack to configure logging before a logger is initialized in each imported module
 from . import initlogging
-from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler
 from telegram.ext.filters import Filters
 import sys
-from . handlers import on_error, on_start_command, on_invalid_message, on_message_with_image
+from . tgbot import on_start, on_error, on_picture, on_query, on_text
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -14,18 +18,22 @@ def main():
 
     dispatcher.add_error_handler(on_error)
 
-    start_handler = CommandHandler(command='start', callback=on_start_command)
+    start_handler = CommandHandler(command='start', callback=on_start, run_async=True)
     dispatcher.add_handler(start_handler)
 
-    img_filter = Filters.photo | Filters.document.image
-    img_handler = MessageHandler(filters=img_filter, callback=on_message_with_image)
-    dispatcher.add_handler(img_handler)
+    picture_handler = MessageHandler(filters=(Filters.photo | Filters.document.image),
+                                     callback=on_picture,
+                                     run_async=True)
+    dispatcher.add_handler(picture_handler)
 
-    reject_handler = MessageHandler(filters=(~Filters.command & ~img_filter),
-                                    callback=on_invalid_message)
-    dispatcher.add_handler(reject_handler)
+    callback_handler = CallbackQueryHandler(callback=on_query, run_async=True)
+    dispatcher.add_handler(callback_handler)
+
+    text_handler = MessageHandler(filters=Filters.text, callback=on_text, run_async=True)
+    dispatcher.add_handler(text_handler)
 
     updater.start_polling()
+    logger.info("Message polling for Telegram bot has started")
     updater.idle()
 
 
