@@ -1,4 +1,7 @@
-{ "palette": [
+{
+  "name": "Montana Black",
+  "url": "https://www.montana-cans.com/en/spray-cans/montana-spray-paint/black-50ml-600ml-graffiti-paint/montana-black-400ml",
+  "palette": [
 {"color":"fcf997","name":"BLK 1005 Smash137's Potato","vendor":"Montana Black"},
 {"color":"ffe570","name":"BLK 1010 Easter yellow","vendor":"Montana Black"},
 {"color":"ffdc14","name":"BLK 1025 Kicking yellow","vendor":"Montana Black"},

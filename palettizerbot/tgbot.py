@@ -73,31 +73,19 @@ def on_text(update: Update, context: CallbackContext):
 
 
 def __send_palettes(update: Update, context: CallbackContext):
-    # todo hardcode, palette names and URLs should be stored in palette JSONs
-    inline_markup: InlineKeyboardMarkup = InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton(text="Montana Black", callback_data="palette mtnblack"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
+    markup_buttons = list(map(
+        lambda i: [
+            InlineKeyboardButton(text=i[1].name, callback_data="palette " + i[0]),
+            InlineKeyboardButton(text="See colors", url=i[1].url)
         ],
-        [
-            InlineKeyboardButton(text="Montana 94", callback_data="palette mtn94"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
-        ],
-        [
-            InlineKeyboardButton(text="Arton", callback_data="palette arton"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
-        ],
-        [
-            InlineKeyboardButton(text="Tikkurila", callback_data="palette tikkurila"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
-        ],
-        [
-            InlineKeyboardButton(text="Don't use a palette", callback_data="palette"),
-        ]
-    ])
+        [(i, Palette.from_predefined(i)) for i in Palette.PREDEFINED_PALETTES]
+    ))
+    markup_buttons.append(
+        [InlineKeyboardButton(text="Don't use a palette", callback_data="palette")]
+    )
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Which palette would you like to use?",
-                             reply_markup=inline_markup)
+                             reply_markup=InlineKeyboardMarkup(markup_buttons))
 
 
 def __send_n_colors_message(query: CallbackQuery):
