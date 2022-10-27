@@ -50,7 +50,7 @@ def on_query(update: Update, context: CallbackContext):
         __send_start_processing_message(update, context)
     elif tokens[0] == "processing":
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Processing is in progress, please wait. Usually it takes a few minutes.")
+                                 text="Processing is in progress, please wait. It might take a few minutes.")
         __do_processing_and_send_result(update, context)
     else:
         context.bot.send_message(chat_id=update.effective_chat.id,
@@ -96,11 +96,20 @@ def __send_n_colors_message(query: CallbackQuery):
 
 
 def __send_start_processing_message(update: Update, context: CallbackContext):
+    palette = __get_palette_from_context(context)
+    palette_name = "not set" if not palette else palette.name
+
+    n_colors = __get_n_colors_from_context(context)
+    n_colors = "unlimited" if n_colors <= 0 else "up to {}".format(n_colors)
+
+    text = """Your choice:
+    Palette: {}
+    Colors: {}""".format(palette_name, n_colors)
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(text="Get result!", callback_data="processing")]
     ])
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="Now everything is set, click the button to get the results.",
+                             text=text,
                              reply_markup=markup)
 
 
