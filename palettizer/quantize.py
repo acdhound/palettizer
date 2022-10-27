@@ -6,6 +6,7 @@ from . imgutils import read_rgb_image, np_image_to_flat_array
 from . palette import Palette, Color
 
 DEFAULT_N_COLORS = 50
+MAX_K_MEANS = 100
 
 
 class QuantizedImage:
@@ -51,6 +52,7 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_color
     if no_palette or (0 < n_colors < palette.size()):
         if n_colors <= 0:
             n_colors = DEFAULT_N_COLORS
+        n_colors = min(n_colors, MAX_K_MEANS)
 
         print("Reducing color space of the image to " + str(n_colors) + " colors")
         kmeans = faiss.Kmeans(d=image_array.shape[1], k=n_colors)

@@ -43,6 +43,8 @@ def on_query(update: Update, context: CallbackContext):
     if tokens[0] == "palette":
         if len(tokens) >= 2:
             __set_palette_to_context(context, tokens[1])
+        else:
+            __set_palette_to_context(context, None)
         __send_n_colors_message(query)
     elif tokens[0] == "no_colors":
         __set_n_colors_to_context(context, 0)
@@ -161,6 +163,10 @@ def __get_palette_from_context(context: CallbackContext):
 
 
 def __set_palette_to_context(context: CallbackContext, palette_id: str):
+    if not palette_id:
+        if "palette" in context.user_data:
+            context.user_data.pop("palette")
+        return
     try:
         palette = Palette.from_predefined([palette_id])
     except Exception as e:
