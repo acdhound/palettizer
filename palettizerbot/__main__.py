@@ -18,18 +18,18 @@ def main():
 
     dispatcher.add_error_handler(on_error)
 
-    start_handler = CommandHandler(command='start', callback=on_start, run_async=True)
+    start_handler = CommandHandler(command='start', callback=on_start, run_async=False)
     dispatcher.add_handler(start_handler)
 
     picture_handler = MessageHandler(filters=(Filters.photo | Filters.document.image),
                                      callback=on_picture,
-                                     run_async=True)
+                                     run_async=False)
     dispatcher.add_handler(picture_handler)
 
-    callback_handler = CallbackQueryHandler(callback=on_query, run_async=True)
+    callback_handler = CallbackQueryHandler(callback=on_query, run_async=False)
     dispatcher.add_handler(callback_handler)
 
-    text_handler = MessageHandler(filters=Filters.text, callback=on_text, run_async=True)
+    text_handler = MessageHandler(filters=Filters.text, callback=on_text, run_async=False)
     dispatcher.add_handler(text_handler)
 
     updater.start_polling()
