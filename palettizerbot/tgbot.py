@@ -3,10 +3,9 @@ from telegram.ext import CallbackContext
 import logging
 from typing import Optional, Union
 from palettizer.palette import Palette
-from palettizer.quantize import quantize
+from palettizer.quantize import quantize, InvalidImageException, MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB
 from palettizer.htmlview import image_and_palette_as_html
 from palettizer.imgutils import image_to_bytes
-
 
 logger = logging.getLogger(__name__)
 
@@ -121,11 +120,17 @@ def __do_processing_and_send_result(update: Update, context: CallbackContext):
     picture: bytes = __get_picture_from_context(context)
     palette: Palette = __get_palette_from_context(context)
     n_colors: int = __get_n_colors_from_context(context)
+
     try:
         logger.debug("Processing image file from the message")
         q_image = quantize(img=picture, palette=palette, n_colors=n_colors)
+    except InvalidImageException as e:
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text="Sorry, your request can't be processed: " + str(e))
+        return
     except Exception as e:
-        raise IOError("Failed to process the image") from e
+        raise Exception("Image quantization failed") from e
+
     try:
         logger.debug("Processing finished, sending the result to the chat")
         context.bot.send_document(chat_id=update.effective_chat.id,
@@ -211,9 +216,9 @@ def __read_picture_as_bytes(update: Update, context: CallbackContext) -> Optiona
 
     if not file.file_size:
         raise Exception("Can't define file size")
-    if file.file_size > 10 * 1024 * 1024:
+    if file.file_size > MAX_IMAGE_SIZE_BYTES:
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Please send a picture up to 10 MB size")
+                                 text="Please, send a picture up to {} MB size".format(MAX_IMAGE_SIZE_MB))
         return None
 
     try:
