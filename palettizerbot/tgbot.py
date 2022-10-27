@@ -3,10 +3,9 @@ from telegram.ext import CallbackContext
 import logging
 from typing import Optional, Union
 from palettizer.palette import Palette
-from palettizer.quantize import quantize
+from palettizer.quantize import quantize, InvalidImageException, MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB
 from palettizer.htmlview import image_and_palette_as_html
 from palettizer.imgutils import image_to_bytes
-
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +50,7 @@ def on_query(update: Update, context: CallbackContext):
         __send_start_processing_message(update, context)
     elif tokens[0] == "processing":
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Processing is in progress, please wait. Usually it takes a few minutes.")
+                                 text="Processing is in progress, please wait. It might take a few minutes.")
         __do_processing_and_send_result(update, context)
     else:
         context.bot.send_message(chat_id=update.effective_chat.id,
@@ -59,8 +58,8 @@ def on_query(update: Update, context: CallbackContext):
 
 
 def on_text(update: Update, context: CallbackContext):
-    if __get_picture_from_context(context) is None:
-        on_start(update, context)
+    if (__get_picture_from_context(context) is None
+            or __get_n_colors_from_context(context) is not None):
         return
     try:
         n_colors: int = int(update.message.text)
@@ -74,31 +73,19 @@ def on_text(update: Update, context: CallbackContext):
 
 
 def __send_palettes(update: Update, context: CallbackContext):
-    # todo hardcode, palette names and URLs should be stored in palette JSONs
-    inline_markup: InlineKeyboardMarkup = InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton(text="Montana Black", callback_data="palette mtnblack"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
+    markup_buttons = list(map(
+        lambda i: [
+            InlineKeyboardButton(text=i[1].name, callback_data="palette " + i[0]),
+            InlineKeyboardButton(text="See colors", url=i[1].url)
         ],
-        [
-            InlineKeyboardButton(text="Montana 94", callback_data="palette mtn94"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
-        ],
-        [
-            InlineKeyboardButton(text="Arton", callback_data="palette arton"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
-        ],
-        [
-            InlineKeyboardButton(text="Tikkurila", callback_data="palette tikkurila"),
-            InlineKeyboardButton(text="See colors", url="https://google.com")
-        ],
-        [
-            InlineKeyboardButton(text="Don't use a palette", callback_data="palette"),
-        ]
-    ])
+        [(i, Palette.from_predefined(i)) for i in Palette.PREDEFINED_PALETTES]
+    ))
+    markup_buttons.append(
+        [InlineKeyboardButton(text="Don't use a palette", callback_data="palette")]
+    )
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text="Which palette would you like to use?",
-                             reply_markup=inline_markup)
+                             reply_markup=InlineKeyboardMarkup(markup_buttons))
 
 
 def __send_n_colors_message(query: CallbackQuery):
@@ -109,11 +96,20 @@ def __send_n_colors_message(query: CallbackQuery):
 
 
 def __send_start_processing_message(update: Update, context: CallbackContext):
+    palette = __get_palette_from_context(context)
+    palette_name = "not set" if not palette else palette.name
+
+    n_colors = __get_n_colors_from_context(context)
+    n_colors = "unlimited" if n_colors <= 0 else "up to {}".format(n_colors)
+
+    text = """Your choice:
+    Palette: {}
+    Colors: {}""".format(palette_name, n_colors)
     markup = InlineKeyboardMarkup([
         [InlineKeyboardButton(text="Get result!", callback_data="processing")]
     ])
     context.bot.send_message(chat_id=update.effective_chat.id,
-                             text="Now everything is set, click the button to get the results.",
+                             text=text,
                              reply_markup=markup)
 
 
@@ -121,11 +117,17 @@ def __do_processing_and_send_result(update: Update, context: CallbackContext):
     picture: bytes = __get_picture_from_context(context)
     palette: Palette = __get_palette_from_context(context)
     n_colors: int = __get_n_colors_from_context(context)
+
     try:
         logger.debug("Processing image file from the message")
         q_image = quantize(img=picture, palette=palette, n_colors=n_colors)
+    except InvalidImageException as e:
+        context.bot.send_message(chat_id=update.effective_chat.id,
+                                 text="Sorry, your request can't be processed: " + str(e))
+        return
     except Exception as e:
-        raise IOError("Failed to process the image") from e
+        raise Exception("Image quantization failed") from e
+
     try:
         logger.debug("Processing finished, sending the result to the chat")
         context.bot.send_document(chat_id=update.effective_chat.id,
@@ -134,6 +136,7 @@ def __do_processing_and_send_result(update: Update, context: CallbackContext):
         context.bot.send_document(chat_id=update.effective_chat.id,
                                   document=str.encode(response_html),
                                   filename="result.html")
+        __cleanup_context(context)
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text="Ready! Send another picture to start again.")
     except Exception as e:
@@ -149,7 +152,11 @@ def __get_picture_from_context(context: CallbackContext) -> Optional[Union[bytes
     return picture
 
 
-def __set_picture_to_context(context: CallbackContext, picture: Union[bytes, bytearray]):
+def __set_picture_to_context(context: CallbackContext, picture: Union[bytes, bytearray, None]):
+    if picture is None:
+        if "picture" in context.user_data:
+            context.user_data.pop("picture")
+        return
     context.user_data["picture"] = picture
 
 
@@ -162,7 +169,7 @@ def __get_palette_from_context(context: CallbackContext):
     return palette
 
 
-def __set_palette_to_context(context: CallbackContext, palette_id: str):
+def __set_palette_to_context(context: CallbackContext, palette_id: Union[str, None]):
     if not palette_id:
         if "palette" in context.user_data:
             context.user_data.pop("palette")
@@ -177,17 +184,29 @@ def __set_palette_to_context(context: CallbackContext, palette_id: str):
 
 
 def __get_n_colors_from_context(context: CallbackContext):
+    if "n_colors" not in context.user_data:
+        return None
     n_colors = context.user_data["n_colors"]
-    if n_colors is not None and isinstance(n_colors, int):
+    if isinstance(n_colors, int):
         return n_colors
     else:
-        return 0
+        return None
 
 
-def __set_n_colors_to_context(context: CallbackContext, n_colors: int):
+def __set_n_colors_to_context(context: CallbackContext, n_colors: Union[int, None]):
+    if n_colors is None:
+        if "n_colors" in context.user_data:
+            context.user_data.pop("n_colors")
+        return
     if n_colors <= 0:
         n_colors = 0
     context.user_data["n_colors"] = n_colors
+
+
+def __cleanup_context(context: CallbackContext):
+    __set_picture_to_context(context, None)
+    __set_palette_to_context(context, None)
+    __set_n_colors_to_context(context, None)
 
 
 def __read_picture_as_bytes(update: Update, context: CallbackContext) -> Optional[Union[bytes, bytearray]]:
@@ -211,9 +230,9 @@ def __read_picture_as_bytes(update: Update, context: CallbackContext) -> Optiona
 
     if not file.file_size:
         raise Exception("Can't define file size")
-    if file.file_size > 10 * 1024 * 1024:
+    if file.file_size > MAX_IMAGE_SIZE_BYTES:
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Please send a picture up to 10 MB size")
+                                 text="Please, send a picture up to {} MB size".format(MAX_IMAGE_SIZE_MB))
         return None
 
     try:

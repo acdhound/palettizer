@@ -1,4 +1,7 @@
-{ "palette": [
+{
+  "name": "Tikkurila Symphony",
+  "url": "https://tikkurila.com/pro/collection/symphony-color-system",
+  "palette": [
 {"color":"f4f2e5","name":"F300","vendor":"Tikkurila"},
 {"color":"f5f2e0","name":"F301","vendor":"Tikkurila"},
 {"color":"f7efd6","name":"F302","vendor":"Tikkurila"},

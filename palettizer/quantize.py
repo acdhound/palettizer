@@ -7,6 +7,9 @@ from . palette import Palette, Color
 
 DEFAULT_N_COLORS = 50
 MAX_K_MEANS = 100
+MAX_IMAGE_SIZE_PIXELS = 3500
+MAX_IMAGE_SIZE_BYTES = 3 * (MAX_IMAGE_SIZE_PIXELS ** 2)  # assuming an uncompressed bitmap image of th max size
+MAX_IMAGE_SIZE_MB = int(MAX_IMAGE_SIZE_BYTES / (1024 * 1024))
 
 
 class QuantizedImage:
@@ -43,8 +46,23 @@ class QuantizedImage:
         return QuantizedImage(image, color_pixels)
 
 
+class InvalidImageException(Exception):
+    pass
+
+
 def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_colors=0) -> QuantizedImage:
+    if ((isinstance(img, bytes) or isinstance(img, bytearray))
+            and len(img) > MAX_IMAGE_SIZE_BYTES):
+        raise InvalidImageException("The file is too large, please, provide a file not bigger than {} MB"
+                                    .format(MAX_IMAGE_SIZE_MB))
+
     image = read_rgb_image(img)
+
+    if (image.shape[0] > MAX_IMAGE_SIZE_PIXELS
+            or image.shape[1] > MAX_IMAGE_SIZE_PIXELS):
+        raise InvalidImageException("The image is too large, please, provide an image not bigger than {}x{} pixels"
+                                    .format(MAX_IMAGE_SIZE_PIXELS, MAX_IMAGE_SIZE_PIXELS))
+
     image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
     no_palette = palette is None or palette.size() == 0

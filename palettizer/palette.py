@@ -33,10 +33,13 @@ class Color:
 
 
 class Palette:
+    # TODO get palette names from the resources instead of hardcoding
     PREDEFINED_PALETTES = ("mtnblack", "mtn94", "arton", "tikkurila")
 
-    def __init__(self, colors: list[Color] = None):
+    def __init__(self, colors: list[Color] = None, name="", url=""):
         self.colors = [] if colors is None else colors
+        self.name = name
+        self.url = url
 
     def size(self):
         return len(self.colors)
@@ -48,18 +51,26 @@ class Palette:
     @staticmethod
     def from_files(paths: Union[list, tuple]):
         colors = []
+        palette_names = []
+        palette_urls = []
         for file in paths:
             with open(file) as json_file:
                 data = json.load(json_file)
+                if 'name' in data:
+                    palette_names.append(data['name'])
+                if 'url' in data:
+                    palette_urls.append(data['url'])
                 arr = data['palette']
                 for item in arr:
-                    colors.append(Color.from_hex_rgb(item['color'], item["name"], item["vendor"]))
-        return Palette(colors)
+                    colors.append(Color.from_hex_rgb(item['color'], item['name'], item['vendor']))
+        return Palette(colors, ' + '.join(palette_names), ', '.join(palette_urls))
 
     @staticmethod
-    def from_predefined(palette_ids: Union[list, tuple]):
+    def from_predefined(palette_ids: Union[str, list, tuple]):
         if not palette_ids:
             return None
+        if isinstance(palette_ids, str):
+            palette_ids = [palette_ids]
         palette_paths = [Palette.__get_palette_path(x) for x in palette_ids]
         return Palette.from_files(palette_paths)
 

@@ -5,6 +5,7 @@ from testutils import get_test_resource
 PALETTE_1 = str(get_test_resource("test-palette-1.json"))
 PALETTE_2 = str(get_test_resource("test-palette-2.json"))
 PALETTE_3 = str(get_test_resource("test-palette-3.json"))
+PALETTE_4 = str(get_test_resource("test-palette-4.json"))
 
 
 def test_parse_palette__single_file():
@@ -26,6 +27,17 @@ def test_parse_palette__multiple_files():
     assert Color(255, 255, 0, name='Yellow', vendor='ABC Paints') in palette.colors
     assert Color(0, 255, 255, name='Cyan', vendor='ABC Paints') in palette.colors
     assert Color(255, 0, 255, name='Magenta', vendor='ABC Paints') in palette.colors
+
+
+def test_parse_palette__url_and_name():
+    palette = Palette().from_file(PALETTE_4)
+
+    assert "My palette" == palette.name
+    assert "https://google.com" == palette.url
+    assert len(palette.colors) == 3
+    assert Color(255, 0, 0, name='Red', vendor='ABC Paints') in palette.colors
+    assert Color(0, 255, 0, name='Green', vendor='ABC Paints') in palette.colors
+    assert Color(0, 0, 255, name='Blue', vendor='ABC Paints') in palette.colors
 
 
 def test_get_predefined_palette__single_file():
