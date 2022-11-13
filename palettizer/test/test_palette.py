@@ -44,7 +44,7 @@ def test_get_predefined_palette__single_file():
     palette = Palette.from_predefined(['mtnblack'])
 
     assert palette is not None
-    assert len(palette.colors) == 189
+    assert len(palette.colors) == 185
     assert Color(252, 249, 151, name="BLK 1005 Smash137's Potato", vendor="Montana Black") in palette.colors
     assert Color(255, 229, 112, name='BLK 1010 Easter yellow', vendor="Montana Black") in palette.colors
     assert Color(255, 220, 20, name='BLK 1025 Kicking yellow', vendor="Montana Black") in palette.colors
@@ -54,7 +54,7 @@ def test_get_predefined_palette__multiple_files():
     palette = Palette.from_predefined(['mtnblack', 'mtn94'])
 
     assert palette is not None
-    assert len(palette.colors) == (189 + 136)
+    assert len(palette.colors) == (185 + 136)
     assert Color(252, 249, 151, name="BLK 1005 Smash137's Potato", vendor="Montana Black") in palette.colors
     assert Color(255, 229, 112, name='BLK 1010 Easter yellow', vendor="Montana Black") in palette.colors
     assert Color(107, 99, 15, name="RV-112 Mission Green", vendor="MTN 94") in palette.colors

@@ -114,14 +114,8 @@
     {"color":"663902","name":"A818 Macadamia • Arton 400 ml.","vendor":"Arton"},
     {"color":"402121","name":"A819 Dark tobbaco • Arton 400 ml.","vendor":"Arton"},
     {"color":"ffffff","name":"A900 Super White • Arton 400 ml.","vendor":"Arton"},
-    {"color":"ffffff","name":"A901 Белый • Arton 400 ml.","vendor":"Arton"},
-    {"color":"ffffff","name":"A902 Белый Глянцевый • Arton 400 ml.","vendor":"Arton"},
-    {"color":"000000","name":"A911 Черный • Arton 400 ml.","vendor":"Arton"},
-    {"color":"000000","name":"A912 Черный глянцевый • Arton 400 ml.","vendor":"Arton"},
-    {"color":"babab6","name":"A921 Хром • Arton 400 ml.","vendor":"Arton"},
-    {"color":"d0c5d1","name":"A922 Outline Silver • Arton 400 ml.","vendor":"Arton"},
-    {"color":"c4b55e","name":"A923 Gold • Arton 400 ml.","vendor":"Arton"},
-    {"color":"9b7a3a","name":"A924 Bronze • Arton 400 ml.","vendor":"Arton"},
+    {"color":"ffffff","name":"A901 White • Arton 400 ml.","vendor":"Arton"},
+    {"color":"000000","name":"A911 Black • Arton 400 ml.","vendor":"Arton"},
     {"color":"b2945b","name":"A925 Cooper • Arton 400 ml.","vendor":"Arton"}
   ]
 }
