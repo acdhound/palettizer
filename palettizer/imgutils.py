@@ -5,6 +5,7 @@ from skimage.util import img_as_ubyte
 from typing import Union
 from io import BytesIO
 import base64
+from skimage.color import rgb2hsv
 
 
 def read_rgb_image(path: Union[str, bytes, bytearray]) -> np.ndarray:
@@ -45,3 +46,7 @@ def np_image_to_base64(img: np.ndarray, img_format: str):
 def np_image_to_flat_array(img: np.ndarray):
     w, h, d = tuple(img.shape)
     return np.reshape(img, (w * h, d))
+
+
+def to_hsv(r: int, g: int, b: int) -> np.ndarray:
+    return rgb2hsv(np.array([[[r, g, b]]], dtype=np.uint8))[0][0]
