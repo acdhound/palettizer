@@ -3,7 +3,7 @@ from . import initlogging
 from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler
 from telegram.ext.filters import Filters
 import sys
-from . tgbot import on_start, on_error, on_picture, on_query, on_text
+from . tgbot import on_start, on_error, on_picture, on_file, on_query, on_text
 import logging
 
 
@@ -25,6 +25,11 @@ def main():
                                      callback=on_picture,
                                      run_async=False)
     dispatcher.add_handler(picture_handler)
+
+    file_handler = MessageHandler(filters=(Filters.document & ~Filters.document.image),
+                                  callback=on_file,
+                                  run_async=False)
+    dispatcher.add_handler(file_handler)
 
     callback_handler = CallbackQueryHandler(callback=on_query, run_async=False)
     dispatcher.add_handler(callback_handler)

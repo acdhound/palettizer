@@ -1,6 +1,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from telegram.ext import CallbackContext
 import logging
+import os
 from typing import Optional, Union
 from palettizer.palette import Palette
 from palettizer.quantize import quantize, InvalidImageException, MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB
@@ -14,7 +15,7 @@ def on_error(update: object, context: CallbackContext) -> None:
     logger.error(msg="Exception while handling an update:", exc_info=context.error)
     if isinstance(update, Update):
         context.bot.send_message(chat_id=update.effective_chat.id,
-                                 text="Something went badly wrong, please contact support")
+                                 text="Something has gone wrong, please contact support @aleave")
 
 
 def on_start(update: Update, context: CallbackContext):
@@ -32,6 +33,11 @@ def on_picture(update: Update, context: CallbackContext):
         __send_palettes(update, context)
 
 
+def on_file(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=update.effective_chat.id,
+                             text="Please, send a picture as .png, .jpg or other image format")
+
+
 def on_query(update: Update, context: CallbackContext):
     query = update.callback_query
     query.answer()
@@ -44,7 +50,7 @@ def on_query(update: Update, context: CallbackContext):
             __set_palette_to_context(context, tokens[1])
         else:
             __set_palette_to_context(context, None)
-        __send_n_colors_message(query)
+        __send_n_colors_message(query, context)
     elif tokens[0] == "no_colors":
         __set_n_colors_to_context(context, 0)
         __send_start_processing_message(update, context)
@@ -88,8 +94,11 @@ def __send_palettes(update: Update, context: CallbackContext):
                              reply_markup=InlineKeyboardMarkup(markup_buttons))
 
 
-def __send_n_colors_message(query: CallbackQuery):
-    query.edit_message_text("How many colors would you like to use? Type the number into the chat or press the button.")
+def __send_n_colors_message(query: CallbackQuery, context: CallbackContext):
+    palette = __get_palette_from_context(context)
+    text = ("Chosen palette: " + palette.name + os.linesep) if palette else ""
+    text += "How many colors would you like to use? Type the number into the chat or press the button."
+    query.edit_message_text(text)
     query.edit_message_reply_markup(InlineKeyboardMarkup([
         [InlineKeyboardButton(text="Unlimited colors", callback_data="no_colors")]
     ]))
