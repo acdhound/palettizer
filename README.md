@@ -4,8 +4,9 @@ This diagram shows how it works:
 
 ![](./assets/how-it-works.png)
 
-You can use it via CLI or Telegram bot.
-Telegram bot isn't publicly available yet, but you can run it locally, see [Telegram Bot](#telegram-bot)
+You can use it via CLI or [Telegram bot](https://t.me/palettizerbot).
+
+You can also run it locally, see [Telegram Bot](#telegram-bot)
 
 ## Installation
 
