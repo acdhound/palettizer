@@ -1,6 +1,7 @@
 import faiss
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
+import cv2
 from typing import Union
 import logging
 from . imgutils import read_rgb_image, np_image_to_flat_array
@@ -8,9 +9,9 @@ from . palette import Palette, Color
 
 DEFAULT_N_COLORS = 50
 MAX_K_MEANS = 100
-MAX_IMAGE_SIZE_PIXELS = 3500
-MAX_IMAGE_SIZE_BYTES = 3 * (MAX_IMAGE_SIZE_PIXELS ** 2)  # assuming an uncompressed bitmap image of th max size
-MAX_IMAGE_SIZE_MB = int(MAX_IMAGE_SIZE_BYTES / (1024 * 1024))
+MAX_IMAGE_SIZE_PIXELS = 2000
+MAX_IMAGE_SIZE_MB = 30
+MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024
 
 
 class QuantizedImage:
@@ -62,8 +63,11 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_color
 
     if (image.shape[0] > MAX_IMAGE_SIZE_PIXELS
             or image.shape[1] > MAX_IMAGE_SIZE_PIXELS):
-        raise InvalidImageException("The image is too large, please, provide an image not bigger than {}x{} pixels"
-                                    .format(MAX_IMAGE_SIZE_PIXELS, MAX_IMAGE_SIZE_PIXELS))
+        logging.info("The image is too big: {}x{}".format(image.shape[0], image.shape[1]))
+        k = MAX_IMAGE_SIZE_PIXELS / max(image.shape[0], image.shape[1])
+        new_size = (int(image.shape[1] * k), int(image.shape[0] * k))
+        logging.info("Resizing the image to {}x{}".format(new_size[0], new_size[1]))
+        image = cv2.resize(image, dsize=new_size, interpolation=cv2.INTER_CUBIC)
 
     image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 

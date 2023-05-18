@@ -15,7 +15,8 @@ setup(
       'python-telegram-bot == 13.14',
       'pyyaml >= 6.0',
       'faiss-cpu >= 1.7.2',
-      'Jinja2 >= 3.1.1'
+      'Jinja2 >= 3.1.1',
+      'opencv-python >= 4.7.0.72'
    ],
    python_requires=">=3.6",
    extras_require={

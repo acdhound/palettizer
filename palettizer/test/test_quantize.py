@@ -1,4 +1,5 @@
 import numpy as np
+
 from palettizer.quantize import quantize
 from palettizer.palette import Palette, Color
 from testutils import get_test_resource
@@ -7,6 +8,7 @@ from testutils import get_test_resource
 IMAGE_4_SQUARES = str(get_test_resource("4_squares.png"))
 IMAGE_2_SQUARES = str(get_test_resource("2_squares.png"))
 IMAGE_BLISS = str(get_test_resource("bliss.jpg"))
+IMAGE_OCTOBER = str(get_test_resource("october.jpg"))
 
 RED = Color(255, 0, 0, name='red', vendor='ABC Paints')
 YELLOW = Color(255, 255, 0, name='yellow', vendor='ABC Paints')
@@ -132,6 +134,18 @@ def test_quantize__large_image__real_palette__max_50_colors():
     assert result.color_pixels[BLK_6725] == 248402
     assert result.color_pixels[BLK_4320] == 272459
     assert result.color_pixels[BLK_5230] == 269379
+
+
+def test_quantize__large_image__resize():
+    result = quantize(img=IMAGE_OCTOBER,
+                      palette=PALETTE_MTN_BLACK,
+                      n_colors=0)
+
+    assert result.image is not None
+    assert result.image.shape == (1500, 2000, 3)
+    assert result.image.dtype == np.uint8
+
+    assert result.color_pixels is not None
 
 
 def test_quantize__image_as_bytes():
