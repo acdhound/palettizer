@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 from typing import Union
 from dataclasses import dataclass
+import numpy as np
 
 
 @dataclass(eq=True, frozen=True)
@@ -43,6 +44,14 @@ class Palette:
 
     def size(self):
         return len(self.colors)
+
+    def to_codebook_palette_unit8(self) -> np.ndarray:
+        codebook_palette_uint8 = np.zeros((self.size(), 3), dtype=np.uint8)
+        i = 0
+        for clr in self.colors:
+            np.put(codebook_palette_uint8[i], [0, 1, 2], [clr.r, clr.g, clr.b])
+            i = i + 1
+        return codebook_palette_uint8
 
     @staticmethod
     def from_file(path: str):

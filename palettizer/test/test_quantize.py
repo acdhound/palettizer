@@ -111,7 +111,7 @@ def test_quantize__large_image__real_palette():
     assert np.array_equal(result.image[374][1500], BLK_9100_PIXEL)
 
     assert result.color_pixels is not None
-    assert result.color_pixels[BLK_6725] == 241112
+    assert result.color_pixels[BLK_6725] == 241108
     assert result.color_pixels[BLK_4320] == 241490
     assert result.color_pixels[BLK_5230] == 276362
 

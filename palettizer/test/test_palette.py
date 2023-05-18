@@ -1,3 +1,5 @@
+import numpy as np
+
 from palettizer.palette import Palette, Color
 from testutils import get_test_resource
 
@@ -59,3 +61,22 @@ def test_get_predefined_palette__multiple_files():
     assert Color(255, 229, 112, name='BLK 1010 Easter yellow', vendor="Montana Black") in palette.colors
     assert Color(107, 99, 15, name="RV-112 Mission Green", vendor="MTN 94") in palette.colors
     assert Color(77, 73, 15, name="RV-113 Gragon Green", vendor="MTN 94") in palette.colors
+
+
+def test_to_codebook_palette():
+    palette = Palette().from_file(PALETTE_1)
+    codebook_palette = palette.to_codebook_palette_unit8()
+
+    assert codebook_palette is not None
+    assert isinstance(codebook_palette, np.ndarray)
+    assert codebook_palette.dtype == np.uint8
+    assert codebook_palette.shape == (3, 3)
+    assert codebook_palette[0][0] == 255
+    assert codebook_palette[0][1] == 0
+    assert codebook_palette[0][2] == 0
+    assert codebook_palette[1][0] == 0
+    assert codebook_palette[1][1] == 255
+    assert codebook_palette[1][2] == 0
+    assert codebook_palette[2][0] == 0
+    assert codebook_palette[2][1] == 0
+    assert codebook_palette[2][2] == 255

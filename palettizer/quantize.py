@@ -2,6 +2,7 @@ import faiss
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
 from typing import Union
+import logging
 from . imgutils import read_rgb_image, np_image_to_flat_array
 from . palette import Palette, Color
 
@@ -72,31 +73,34 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_color
             n_colors = DEFAULT_N_COLORS
         n_colors = min(n_colors, MAX_K_MEANS)
 
-        print("Reducing color space of the image to " + str(n_colors) + " colors")
+        logging.info("Reducing color space of the image to " + str(n_colors) + " colors")
         kmeans = faiss.Kmeans(d=image_array.shape[1], k=n_colors)
         image_array_32 = image_array.astype(np.float32)
         kmeans.train(image_array_32)
         kmeans_palette = kmeans.centroids
         kmeans_labels = kmeans.index.search(image_array_32, 1)[1]
-        kmeans_labels = [i[0] for i in kmeans_labels]
+        kmeans_labels = kmeans_labels[:, 0]
         if no_palette:
             kmeans_palette = (kmeans_palette * 255.0).astype(np.uint8)
             return QuantizedImage.from_codebook_labels(kmeans_palette, kmeans_labels, image.shape[0], image.shape[1])
 
-        kmeans_image = QuantizedImage.from_codebook_labels(kmeans_palette, kmeans_labels,
-                                                           image.shape[0], image.shape[1]).image
-        kmeans_image = kmeans_image.astype(np.float64)
-        image_array = np_image_to_flat_array(kmeans_image)
-        image = kmeans_image
+        logging.info("Converting image colors to the palette")
+        codebook_palette_uint8 = palette.to_codebook_palette_unit8()
+        codebook_palette = codebook_palette_uint8.astype(dtype=np.float32) / 255
+        pairwise_distances_argmin(codebook_palette, kmeans_palette, axis=0)
+        kmeans_to_palette = pairwise_distances_argmin(codebook_palette, kmeans_palette, axis=0)
+        reduced_codebook_palette_uint8 = np.zeros(shape=kmeans_palette.shape, dtype=np.uint8)
+        reduced_colors = []
+        for i in range(0, kmeans_palette.shape[0]):
+            reduced_codebook_palette_uint8[i] = codebook_palette_uint8[kmeans_to_palette[i]]
+            reduced_colors.append(palette.colors[kmeans_to_palette[i]])
+        return QuantizedImage.from_codebook_labels(reduced_codebook_palette_uint8, kmeans_labels,
+                                                   image.shape[0], image.shape[1],
+                                                   Palette(colors=reduced_colors, name=palette.name, url=palette.url))
 
-    print("Converting image colors to the palette")
-    codebook_palette = np.zeros((palette.size(), 3), dtype=np.float64)
-    codebook_palette_uint8 = np.zeros((palette.size(), 3), dtype=np.uint8)
-    i = 0
-    for clr in palette.colors:
-        np.put(codebook_palette[i], [0, 1, 2], [float(clr.r) / 255, float(clr.g) / 255, float(clr.b) / 255])
-        np.put(codebook_palette_uint8[i], [0, 1, 2], [clr.r, clr.g, clr.b])
-        i = i + 1
+    logging.info("Converting image colors to the palette")
+    codebook_palette_uint8 = palette.to_codebook_palette_unit8()
+    codebook_palette = codebook_palette_uint8.astype(dtype=np.float32) / 255
     labels_palette = pairwise_distances_argmin(codebook_palette, image_array, axis=0)
 
     return QuantizedImage.from_codebook_labels(codebook_palette_uint8, labels_palette,
