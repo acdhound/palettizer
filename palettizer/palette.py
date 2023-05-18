@@ -54,7 +54,7 @@ class Palette:
         palette_names = []
         palette_urls = []
         for file in paths:
-            with open(file) as json_file:
+            with open(file, mode='r', encoding='utf8') as json_file:
                 data = json.load(json_file)
                 if 'name' in data:
                     palette_names.append(data['name'])

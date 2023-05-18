@@ -12,7 +12,7 @@ setup(
       'scikit-learn >= 1.0.2',
       'numpy >= 1.22.0',
       'imageio >= 2.13.5',
-      'python-telegram-bot',
+      'python-telegram-bot == 13.14',
       'pyyaml >= 6.0',
       'faiss-cpu >= 1.7.2',
       'Jinja2 >= 3.1.1'
