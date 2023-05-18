@@ -26,24 +26,25 @@ class QuantizedImage:
                              w: int, h: int,
                              palette: Palette = None):
         """Recreate the (compressed) image from the code book & labels"""
-        d = codebook.shape[1]
-        image = np.zeros(shape=(w, h, d), dtype=codebook.dtype)
-        label_idx = 0
+
         color_pixels: dict[Color, int] = {}
         colors: list[Color] = palette.colors if palette is not None else [None] * len(codebook)
-        for i in range(w):
-            for j in range(h):
-                label = labels[label_idx]
-                image[i][j] = codebook[label]
-                color = colors[label]
-                if color is None:
-                    color = Color(codebook[label][0], codebook[label][1], codebook[label][2])
-                    colors[label] = color
-                if color not in color_pixels:
-                    color_pixels[color] = 1
-                else:
-                    color_pixels[color] += 1
-                label_idx += 1
+
+        def label_to_rgb(label):
+            rgb = codebook[label]
+            color = colors[label]
+            if color is None:
+                color = Color(rgb[0], rgb[1], rgb[2])
+                colors[label] = color
+            if color not in color_pixels:
+                color_pixels[color] = 1
+            else:
+                color_pixels[color] += 1
+            return rgb
+
+        flat_image = np.array([label_to_rgb(i) for i in labels], dtype=codebook.dtype)
+        image = flat_image.reshape((w, h, codebook.shape[1]))
+
         return QuantizedImage(image, color_pixels)
 
 
