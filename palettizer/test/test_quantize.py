@@ -116,6 +116,24 @@ def test_quantize__large_image__real_palette():
     assert result.color_pixels[BLK_5230] == 276362
 
 
+def test_quantize__large_image__real_palette__max_50_colors():
+    result = quantize(img=IMAGE_BLISS,
+                      palette=PALETTE_MTN_BLACK,
+                      n_colors=50)
+
+    assert result.image is not None
+    assert result.image.shape == (1080, 1920, 3)
+    assert result.image.dtype == np.uint8
+    assert np.array_equal(result.image[79][260], BLK_TR5010_PIXEL)
+    assert np.array_equal(result.image[644][160], BLK_6710_PIXEL)
+    assert np.array_equal(result.image[374][1500], BLK_9100_PIXEL)
+
+    assert result.color_pixels is not None
+    assert result.color_pixels[BLK_6725] == 248402
+    assert result.color_pixels[BLK_4320] == 272459
+    assert result.color_pixels[BLK_5230] == 269379
+
+
 def test_quantize__image_as_bytes():
     with open(IMAGE_4_SQUARES, 'rb') as f:
         image_bin = f.read()
