@@ -31,19 +31,18 @@ class QuantizedImage:
         color_pixels: dict[Color, int] = {}
         colors: list[Color] = palette.colors if palette is not None else [None] * len(codebook)
 
-        def label_to_rgb(label):
-            rgb = codebook[label]
-            color = colors[label]
+        flat_image = np.ndarray(shape=(labels.shape[0], codebook.shape[1]), dtype=codebook.dtype)
+        for i in range(0, labels.shape[0]):
+            flat_image[i] = codebook[labels[i]]
+            color = colors[labels[i]]
             if color is None:
-                color = Color(rgb[0], rgb[1], rgb[2])
-                colors[label] = color
+                color = Color(codebook[labels[i]][0], codebook[labels[i]][1], codebook[labels[i]][2])
+                colors[labels[i]] = color
             if color not in color_pixels:
                 color_pixels[color] = 1
             else:
                 color_pixels[color] += 1
-            return rgb
 
-        flat_image = np.array([label_to_rgb(i) for i in labels], dtype=codebook.dtype)
         image = flat_image.reshape((w, h, codebook.shape[1]))
 
         return QuantizedImage(image, color_pixels)
