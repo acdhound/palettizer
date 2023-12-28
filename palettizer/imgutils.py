@@ -1,5 +1,5 @@
 import numpy as np
-import imageio
+import imageio.v2 as imageio
 from skimage import io
 from skimage.util import img_as_ubyte
 from typing import Union

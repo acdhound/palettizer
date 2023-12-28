@@ -91,8 +91,7 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_color
         logging.info("Converting image colors to the palette")
         codebook_palette_uint8 = palette.to_codebook_palette_unit8()
         codebook_palette = codebook_palette_uint8.astype(dtype=np.float32) / 255
-        pairwise_distances_argmin(codebook_palette, kmeans_palette, axis=0)
-        kmeans_to_palette = pairwise_distances_argmin(codebook_palette, kmeans_palette, axis=0)
+        kmeans_to_palette = pairwise_distances_argmin(kmeans_palette, codebook_palette)
         reduced_codebook_palette_uint8 = np.zeros(shape=kmeans_palette.shape, dtype=np.uint8)
         reduced_colors = []
         for i in range(0, kmeans_palette.shape[0]):
@@ -105,7 +104,7 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_color
     logging.info("Converting image colors to the palette")
     codebook_palette_uint8 = palette.to_codebook_palette_unit8()
     codebook_palette = codebook_palette_uint8.astype(dtype=np.float32) / 255
-    labels_palette = pairwise_distances_argmin(codebook_palette, image_array, axis=0)
+    labels_palette = pairwise_distances_argmin(image_array, codebook_palette)
 
     return QuantizedImage.from_codebook_labels(codebook_palette_uint8, labels_palette,
                                                image.shape[0], image.shape[1],
