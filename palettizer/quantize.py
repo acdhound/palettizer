@@ -2,6 +2,7 @@ import faiss
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
 import cv2
+from colour import delta_E
 from typing import Union
 import logging
 from . imgutils import read_rgb_image, np_image_to_flat_array
@@ -90,8 +91,10 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_color
 
         logging.info("Converting image colors to the palette")
         codebook_palette_uint8 = palette.to_codebook_palette_unit8()
-        codebook_palette = codebook_palette_uint8.astype(dtype=np.float32) / 255
-        kmeans_to_palette = pairwise_distances_argmin(kmeans_palette, codebook_palette)
+        codebook_palette_float32 = codebook_palette_uint8.astype(dtype=np.float32) / 255
+        codebook_palette_lab = cv2.cvtColor(np.array([codebook_palette_float32]), cv2.COLOR_RGB2Lab)[0]
+        kmeans_palette_lab = cv2.cvtColor(np.array([kmeans_palette]), cv2.COLOR_RGB2Lab)[0]
+        kmeans_to_palette = pairwise_distances_argmin(kmeans_palette_lab, codebook_palette_lab, metric=delta_e_distance)
         reduced_codebook_palette_uint8 = np.zeros(shape=kmeans_palette.shape, dtype=np.uint8)
         reduced_colors = []
         for i in range(0, kmeans_palette.shape[0]):
@@ -109,3 +112,7 @@ def quantize(img: Union[str, bytes, bytearray], palette: Palette = None, n_color
     return QuantizedImage.from_codebook_labels(codebook_palette_uint8, labels_palette,
                                                image.shape[0], image.shape[1],
                                                palette)
+
+
+def delta_e_distance(u, v):
+    return delta_E(u, v, 'CIE 2000')
