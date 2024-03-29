@@ -2,10 +2,9 @@ import faiss
 import numpy as np
 from sklearn.metrics import pairwise_distances_argmin
 import cv2
-from colour import delta_E
 from typing import Union
 import logging
-from . imgutils import read_rgb_image, np_image_to_flat_array
+from . imgutils import read_rgb_image, np_image_to_flat_array, rgb_flat_array_to_lab, delta_e_2000
 from . palette import Palette, Color
 
 DEFAULT_N_COLORS = 50
@@ -14,6 +13,7 @@ MAX_IMAGE_SIZE_PIXELS = 2000
 MAX_IMAGE_SIZE_MB = 30
 MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024
 DELTA_E_METRIC = "delta_e"
+EUCLIDEAN_METRIC = "euclidean"
 
 
 class QuantizedImage:
@@ -57,58 +57,88 @@ class InvalidImageException(Exception):
 def quantize(img: Union[str, bytes, bytearray],
              palette: Palette = None,
              n_colors=0,
-             metric="euclidean") -> QuantizedImage:
+             metric=EUCLIDEAN_METRIC) -> QuantizedImage:
 
     if (isinstance(img, bytes) or isinstance(img, bytearray)) and len(img) > MAX_IMAGE_SIZE_BYTES:
         raise InvalidImageException("The file is too large, please, provide a file not bigger than {} MB"
                                     .format(MAX_IMAGE_SIZE_MB))
 
     image = __resize_image_if_too_large(read_rgb_image(img))
-    image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
     # Case 1: palette not set
     if palette is None or palette.size() == 0:
-        n_colors = DEFAULT_N_COLORS if n_colors <= 0 else n_colors
-        n_colors = min(n_colors, MAX_K_MEANS)
-        kmeans_labels, kmeans_palette = __apply_kmeans_to_flat_array(image_array, n_colors)
-        return QuantizedImage.from_codebook_labels((kmeans_palette * 255.0).astype(np.uint8),
-                                                   kmeans_labels,
-                                                   image.shape[0], image.shape[1])
+        return quantize_to_n_colors(image, n_colors)
 
     # Case 2: colors count is limited
     if n_colors > 0:
-        n_colors = min(n_colors, MAX_K_MEANS)
-
-        kmeans_labels, kmeans_palette = __apply_kmeans_to_flat_array(image_array, n_colors)
-
-        logging.info("Converting image colors to the palette")
-        codebook_palette_uint8 = palette.to_codebook_palette_unit8()
-        codebook_palette_float32 = codebook_palette_uint8.astype(dtype=np.float32) / 255
-
-        if metric == DELTA_E_METRIC:
-            codebook_palette_lab = cv2.cvtColor(np.array([codebook_palette_float32]), cv2.COLOR_RGB2Lab)[0]
-            kmeans_palette_lab = cv2.cvtColor(np.array([kmeans_palette]), cv2.COLOR_RGB2Lab)[0]
-            closest_codebook_for_kmeans = pairwise_distances_argmin(kmeans_palette_lab,
-                                                                    codebook_palette_lab,
-                                                                    metric=delta_e_distance)
-        else:
-            closest_codebook_for_kmeans = pairwise_distances_argmin(kmeans_palette,
-                                                                    codebook_palette_float32,
-                                                                    metric=metric)
-
-        reduced_codebook_palette_uint8 = np.zeros(shape=kmeans_palette.shape, dtype=np.uint8)
-        reduced_colors = []
-        for i in range(0, kmeans_palette.shape[0]):
-            reduced_codebook_palette_uint8[i] = codebook_palette_uint8[closest_codebook_for_kmeans[i]]
-            reduced_colors.append(palette.colors[closest_codebook_for_kmeans[i]])
-        return QuantizedImage.from_codebook_labels(reduced_codebook_palette_uint8, kmeans_labels,
-                                                   image.shape[0], image.shape[1],
-                                                   Palette(colors=reduced_colors, name=palette.name, url=palette.url))
+        return quantize_to_n_colors_with_palette(image, palette, metric, n_colors)
 
     # Case 3: colors count is not limited
-    logging.info("Converting image colors to the palette")
+    return quantize_with_palette(image, palette, metric)
+
+
+def quantize_to_n_colors(image: np.ndarray, n_colors: int):
+    n_colors = DEFAULT_N_COLORS if n_colors <= 0 else n_colors
+    n_colors = min(n_colors, MAX_K_MEANS)
+
+    image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
+    kmeans_labels, kmeans_palette = __apply_kmeans_to_flat_array(image_array, n_colors)
+
+    return QuantizedImage.from_codebook_labels((kmeans_palette * 255.0).astype(np.uint8),
+                                               kmeans_labels,
+                                               image.shape[0], image.shape[1])
+
+
+def quantize_to_n_colors_with_palette(image: np.ndarray,
+                                      palette: Palette,
+                                      metric: str,
+                                      n_colors: int):
+    n_colors = min(n_colors, MAX_K_MEANS)
+
+    # first, perform K-means in order to reduce color space to N colors
+    # then the palette will be matched with the vector of K-means colors instead of the whole image
+    image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
+    kmeans_labels, kmeans_palette = __apply_kmeans_to_flat_array(image_array, n_colors)
+
+    logging.info("Converting " + str(n_colors) + " image colors to the palette")
     codebook_palette_uint8 = palette.to_codebook_palette_unit8()
     codebook_palette_float32 = codebook_palette_uint8.astype(dtype=np.float32) / 255
+
+    # find the closest color from the original palette for each from the K-means palette
+    # if j = closest_codebook_for_kmeans[i] then codebook_palette_uint8[j] is the closest to kmeans_palette[i]
+    if metric == DELTA_E_METRIC:
+        closest_codebook_for_kmeans = pairwise_distances_argmin(rgb_flat_array_to_lab(codebook_palette_float32),
+                                                                rgb_flat_array_to_lab(kmeans_palette),
+                                                                metric=delta_e_2000)
+    else:
+        closest_codebook_for_kmeans = pairwise_distances_argmin(kmeans_palette,
+                                                                codebook_palette_float32,
+                                                                metric=metric)
+
+    # the K-means palette colors are mapped to the closest colors from the original palette
+    # n_colors_codebook_palette_uint8 and colors might contain duplicates!
+    n_colors_codebook_palette_uint8 = np.zeros(shape=kmeans_palette.shape, dtype=np.uint8)
+    colors = []
+    for i in range(0, kmeans_palette.shape[0]):
+        n_colors_codebook_palette_uint8[i] = codebook_palette_uint8[closest_codebook_for_kmeans[i]]
+        colors.append(palette.colors[closest_codebook_for_kmeans[i]])
+
+    # ordering of the mapped colors is the same as in K-means palette, so kmeans_labels can be used as indexes
+    return QuantizedImage.from_codebook_labels(n_colors_codebook_palette_uint8, kmeans_labels,
+                                               image.shape[0], image.shape[1],
+                                               Palette(colors=colors, name=palette.name, url=palette.url))
+
+
+def quantize_with_palette(image: np.ndarray,
+                          palette: Palette,
+                          metric: str):
+    logging.info("Converting image colors to the palette")
+
+    image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
+
+    codebook_palette_uint8 = palette.to_codebook_palette_unit8()
+    codebook_palette_float32 = codebook_palette_uint8.astype(dtype=np.float32) / 255
+    # delta E metric is not supported here because it would be too slow
     labels_palette = pairwise_distances_argmin(image_array, codebook_palette_float32, metric=metric)
 
     return QuantizedImage.from_codebook_labels(codebook_palette_uint8, labels_palette,
@@ -116,11 +146,7 @@ def quantize(img: Union[str, bytes, bytearray],
                                                palette)
 
 
-def delta_e_distance(u, v):
-    return delta_E(u, v, 'CIE 2000')
-
-
-def __resize_image_if_too_large(image):
+def __resize_image_if_too_large(image: np.ndarray):
     if image.shape[0] > MAX_IMAGE_SIZE_PIXELS or image.shape[1] > MAX_IMAGE_SIZE_PIXELS:
         logging.info("The image is too big: {}x{}".format(image.shape[0], image.shape[1]))
         k = MAX_IMAGE_SIZE_PIXELS / max(image.shape[0], image.shape[1])
@@ -130,7 +156,7 @@ def __resize_image_if_too_large(image):
     return image
 
 
-def __apply_kmeans_to_flat_array(image_array, n_colors):
+def __apply_kmeans_to_flat_array(image_array: np.ndarray, n_colors: int):
     logging.info("Running K-Means: reducing color space of the image to " + str(n_colors) + " colors")
     kmeans = faiss.Kmeans(d=image_array.shape[1], k=n_colors)
     image_array_32 = image_array.astype(np.float32)

@@ -6,6 +6,8 @@ from typing import Union
 from io import BytesIO
 import base64
 from skimage.color import rgb2hsv
+import cv2
+from colour import delta_E
 
 
 def read_rgb_image(path: Union[str, bytes, bytearray]) -> np.ndarray:
@@ -50,3 +52,11 @@ def np_image_to_flat_array(img: np.ndarray):
 
 def to_hsv(r: int, g: int, b: int) -> np.ndarray:
     return rgb2hsv(np.array([[[r, g, b]]], dtype=np.uint8))[0][0]
+
+
+def rgb_flat_array_to_lab(arr: np.ndarray) -> np.ndarray:
+    return cv2.cvtColor(np.array([arr]), cv2.COLOR_RGB2Lab)[0]
+
+
+def delta_e_2000(u, v):
+    return delta_E(u, v, 'CIE 2000')
