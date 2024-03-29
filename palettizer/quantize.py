@@ -107,8 +107,8 @@ def quantize_to_n_colors_with_palette(image: np.ndarray,
     # find the closest color from the original palette for each from the K-means palette
     # if j = closest_codebook_for_kmeans[i] then codebook_palette_uint8[j] is the closest to kmeans_palette[i]
     if metric == DELTA_E_METRIC:
-        closest_codebook_for_kmeans = pairwise_distances_argmin(rgb_flat_array_to_lab(codebook_palette_float32),
-                                                                rgb_flat_array_to_lab(kmeans_palette),
+        closest_codebook_for_kmeans = pairwise_distances_argmin(rgb_flat_array_to_lab(kmeans_palette),
+                                                                rgb_flat_array_to_lab(codebook_palette_float32),
                                                                 metric=delta_e_2000)
     else:
         closest_codebook_for_kmeans = pairwise_distances_argmin(kmeans_palette,

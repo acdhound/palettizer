@@ -1,8 +1,11 @@
 import numpy as np
 
 from palettizer.quantize import quantize
+from palettizer.quantize import EUCLIDEAN_METRIC, DELTA_E_METRIC
 from palettizer.palette import Palette, Color
 from testutils import get_test_resource
+
+import pytest
 
 
 IMAGE_4_SQUARES = str(get_test_resource("4_squares.png"))
@@ -58,10 +61,12 @@ def test_quantize__4_colors_palette():
     assert result.color_pixels[BLUE] == 400
 
 
-def test_quantize__4_colors_palette__max_2_colors():
+@pytest.mark.parametrize("metric", [EUCLIDEAN_METRIC, DELTA_E_METRIC])
+def test_quantize__4_colors_palette__max_2_colors(metric):
     result = quantize(img=IMAGE_2_SQUARES,
                       palette=PALETTE_4_COLORS,
-                      n_colors=2)
+                      n_colors=2,
+                      metric=metric)
 
     assert result.image is not None
     assert result.image.shape == (20, 40, 3)
