@@ -4,7 +4,7 @@ import logging
 import os
 from typing import Optional, Union
 from palettizer.palette import Palette
-from palettizer.quantize import quantize, InvalidImageException, MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB
+from palettizer.quantize import quantize, InvalidImageException, MAX_IMAGE_SIZE_BYTES, MAX_IMAGE_SIZE_MB, DELTA_E_METRIC
 from palettizer.htmlview import image_and_palette_as_html
 from palettizer.imgutils import image_to_bytes
 
@@ -129,7 +129,7 @@ def __do_processing_and_send_result(update: Update, context: CallbackContext):
 
     try:
         logger.debug("Processing image file from the message")
-        q_image = quantize(img=picture, palette=palette, n_colors=n_colors)
+        q_image = quantize(img=picture, palette=palette, n_colors=n_colors, metric=DELTA_E_METRIC)
     except InvalidImageException as e:
         context.bot.send_message(chat_id=update.effective_chat.id,
                                  text="Sorry, your request can't be processed: " + str(e))
