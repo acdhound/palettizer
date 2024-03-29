@@ -74,6 +74,10 @@ def quantize(img: Union[str, bytes, bytearray],
         return quantize_to_n_colors_with_palette(image, palette, metric, n_colors)
 
     # Case 3: colors count is not limited
+    if metric == DELTA_E_METRIC:
+        # unlimited colors with delta E would take too long time
+        return quantize_to_n_colors_with_palette(image, palette, metric, MAX_K_MEANS)
+
     return quantize_with_palette(image, palette, metric)
 
 

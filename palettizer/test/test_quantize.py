@@ -32,10 +32,12 @@ BLK_6710_PIXEL = np.array([147, 184, 39], dtype=np.uint8)
 BLK_9100_PIXEL = np.array([255, 255, 255], dtype=np.uint8)
 
 
-def test_quantize__4_colors_palette():
+@pytest.mark.parametrize("metric", [EUCLIDEAN_METRIC, DELTA_E_METRIC])
+def test_quantize__4_colors_palette(metric):
     result = quantize(img=IMAGE_4_SQUARES,
                       palette=PALETTE_4_COLORS,
-                      n_colors=0)
+                      n_colors=0,
+                      metric=metric)
 
     assert result.image is not None
     assert result.image.shape == (40, 40, 3)
