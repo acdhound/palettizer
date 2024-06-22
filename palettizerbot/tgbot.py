@@ -70,7 +70,7 @@ def on_text(update: Update, context: CallbackContext):
     try:
         n_colors: int = int(update.message.text)
     except Exception as e:
-        logger.debug("Failed to parse number of colors from the message")
+        logger.info("Could not parse number of colors from the message")
         logger.debug(e)
         context.bot.send_message(chat_id=update.effective_chat.id, text="Please enter only numbers")
         return
@@ -128,7 +128,7 @@ def __do_processing_and_send_result(update: Update, context: CallbackContext):
     n_colors: int = __get_n_colors_from_context(context)
 
     try:
-        logger.debug("Processing image file from the message")
+        logger.info("Processing image file from the message")
         q_image = quantize(img=picture, palette=palette, n_colors=n_colors, metric=DELTA_E_METRIC)
     except InvalidImageException as e:
         context.bot.send_message(chat_id=update.effective_chat.id,
@@ -138,7 +138,7 @@ def __do_processing_and_send_result(update: Update, context: CallbackContext):
         raise Exception("Image quantization failed") from e
 
     try:
-        logger.debug("Processing finished, sending the result to the chat")
+        logger.info("Processing finished, sending the result to the chat")
         context.bot.send_document(chat_id=update.effective_chat.id,
                                   document=image_to_bytes(q_image.image))
         response_html = image_and_palette_as_html(q_image)
@@ -246,7 +246,7 @@ def __read_picture_as_bytes(update: Update, context: CallbackContext) -> Optiona
 
     try:
         image_binary = file.download_as_bytearray()
-        logger.debug(f"A file of {len(image_binary)} bytes downloaded from the message")
+        logger.info(f"A file of {len(image_binary)} bytes downloaded from the message")
         return image_binary
     except Exception as e:
         raise IOError("Failed to download file attached to the message") from e
