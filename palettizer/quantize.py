@@ -8,7 +8,7 @@ from . imgutils import read_rgb_image, np_image_to_flat_array, rgb_flat_array_to
 from . palette import Palette, Color
 
 DEFAULT_N_COLORS = 50
-MAX_K_MEANS = 100
+MAX_K_MEANS = 150
 MAX_IMAGE_SIZE_PIXELS = 2000
 MAX_IMAGE_SIZE_MB = 30
 MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024
