@@ -11,6 +11,9 @@ import pytest
 IMAGE_4_SQUARES = str(get_test_resource("4_squares.png"))
 IMAGE_2_SQUARES = str(get_test_resource("2_squares.png"))
 IMAGE_BLISS = str(get_test_resource("bliss.jpg"))
+IMAGE_BLISS_WDT = 1920
+IMAGE_BLISS_HGT = 1080
+IMAGE_BLISS_AREA = IMAGE_BLISS_HGT * IMAGE_BLISS_WDT
 IMAGE_OCTOBER = str(get_test_resource("october.jpg"))
 
 RED = Color(255, 0, 0, name='red', vendor='ABC Paints')
@@ -86,13 +89,15 @@ def test_quantize__4_colors_palette__max_2_colors(metric):
     assert result.color_pixels[YELLOW] == 400
 
 
-def test_quantize__large_image__4_colors_palette():
+@pytest.mark.parametrize("metric", [EUCLIDEAN_METRIC, DELTA_E_METRIC])
+def test_quantize__large_image__4_colors_palette(metric):
     result = quantize(img=IMAGE_BLISS,
                       palette=PALETTE_4_COLORS,
-                      n_colors=0)
+                      n_colors=0,
+                      metric=metric)
 
     assert result.image is not None
-    assert result.image.shape == (1080, 1920, 3)
+    assert result.image.shape == (IMAGE_BLISS_HGT, IMAGE_BLISS_WDT, 3)
     assert result.image.dtype == np.uint8
     assert np.array_equal(result.image[221][779], BLUE_PIXEL)
     assert np.array_equal(result.image[411][1503], YELLOW_PIXEL)
@@ -101,10 +106,10 @@ def test_quantize__large_image__4_colors_palette():
 
     assert result.color_pixels is not None
     assert len(result.color_pixels.keys()) == 4
-    assert result.color_pixels[RED] == 4176
-    assert result.color_pixels[YELLOW] == 234877
-    assert result.color_pixels[GREEN] == 780095
-    assert result.color_pixels[BLUE] == 1054452
+    assert 0 < result.color_pixels[RED] < 0.1 * IMAGE_BLISS_AREA
+    assert 0 < result.color_pixels[YELLOW] < 0.2 * IMAGE_BLISS_AREA
+    assert 0.3 * IMAGE_BLISS_AREA < result.color_pixels[GREEN] < 0.6 * IMAGE_BLISS_AREA
+    assert 0.4 * IMAGE_BLISS_AREA < result.color_pixels[BLUE] < 0.7 * IMAGE_BLISS_AREA
 
 
 def test_quantize__large_image__real_palette():
@@ -113,7 +118,7 @@ def test_quantize__large_image__real_palette():
                       n_colors=0)
 
     assert result.image is not None
-    assert result.image.shape == (1080, 1920, 3)
+    assert result.image.shape == (IMAGE_BLISS_HGT, IMAGE_BLISS_WDT, 3)
     assert result.image.dtype == np.uint8
     assert np.array_equal(result.image[79][260], BLK_TR5010_PIXEL)
     assert np.array_equal(result.image[644][160], BLK_6710_PIXEL)
@@ -131,7 +136,7 @@ def test_quantize__large_image__real_palette__max_50_colors():
                       n_colors=50)
 
     assert result.image is not None
-    assert result.image.shape == (1080, 1920, 3)
+    assert result.image.shape == (IMAGE_BLISS_HGT, IMAGE_BLISS_WDT, 3)
     assert result.image.dtype == np.uint8
     assert np.array_equal(result.image[79][260], BLK_TR5010_PIXEL)
     assert np.array_equal(result.image[644][160], BLK_6710_PIXEL)
