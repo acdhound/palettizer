@@ -131,10 +131,12 @@ def test_quantize__large_image__real_palette(n_colors, metric):
     assert 0.05 * IMAGE_BLISS_AREA < result.color_pixels[BLK_6725] < 0.3 * IMAGE_BLISS_AREA
 
 
-def test_quantize__large_image__resize():
+@pytest.mark.parametrize("metric", [EUCLIDEAN_METRIC, DELTA_E_METRIC])
+def test_quantize__large_image__resize(metric):
     result = quantize(img=IMAGE_OCTOBER,
                       palette=PALETTE_MTN_BLACK,
-                      n_colors=0)
+                      n_colors=0,
+                      metric=metric)
 
     assert result.image is not None
     assert result.image.shape == (1500, 2000, 3)
