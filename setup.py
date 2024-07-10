@@ -16,11 +16,16 @@ setup(
       'pyyaml >= 6.0',
       'faiss-cpu >= 1.7.2',
       'Jinja2 >= 3.1.1',
-      'opencv-python-headless >= 4.7.0.72'
+      'opencv-python-headless >= 4.8.1.78',
+      'colour-science >= 0.4.4'
    ],
    python_requires=">=3.6",
    extras_require={
-      'test': ['pytest']
+      'test': [
+         'pytest',
+         # workaround for debugger
+         'matplotlib >= 3.5.3'
+      ]
    },
    package_data={
         "": ["resources/*.*"],
