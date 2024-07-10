@@ -76,6 +76,8 @@ def quantize(img: Union[str, bytes, bytearray],
     # Case 3: colors count is not limited
     if metric == DELTA_E_METRIC:
         # unlimited colors with delta E would take too long time
+        logging.info("Can't convert an image using Delta E metric with unlimited colors" +
+                     ", taking {} as max colors count", MAX_K_MEANS)
         return quantize_to_n_colors_with_palette(image, palette, metric, MAX_K_MEANS)
 
     return quantize_with_palette(image, palette, metric)
@@ -84,6 +86,8 @@ def quantize(img: Union[str, bytes, bytearray],
 def quantize_to_n_colors(image: np.ndarray, n_colors: int):
     n_colors = DEFAULT_N_COLORS if n_colors <= 0 else n_colors
     n_colors = min(n_colors, MAX_K_MEANS)
+
+    logging.info("Quantizing image to {} colors", n_colors)
 
     image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
     kmeans_labels, kmeans_palette = __apply_kmeans_to_flat_array(image_array, n_colors)
@@ -98,6 +102,9 @@ def quantize_to_n_colors_with_palette(image: np.ndarray,
                                       metric: str,
                                       n_colors: int):
     n_colors = min(n_colors, MAX_K_MEANS)
+
+    logging.info("Converting image colors palette {} using up to {} colors and metric {}",
+                 palette.name, n_colors, metric)
 
     # first, perform K-means in order to reduce color space to N colors
     # then the palette will be matched with the vector of K-means colors instead of the whole image
@@ -136,7 +143,7 @@ def quantize_to_n_colors_with_palette(image: np.ndarray,
 def quantize_with_palette(image: np.ndarray,
                           palette: Palette,
                           metric: str):
-    logging.info("Converting image colors to the palette")
+    logging.info("Converting image colors palette {} using metric {}", palette.name, metric)
 
     image_array = np_image_to_flat_array(np.array(image, dtype=np.float64) / 255)
 
